@@ -1,0 +1,1 @@
+{"title":"Remove from index on destroy/update","tags":["open"],"date":"2009-11-19T02:53:02Z","author":" <simon.a.chiang@gmail.com>","type":"issue","content":"Documents need to be removed from indexes when they are removed/destroyed.","at":"7d16dd4422f3632e545cd1e8649337bec2ada2b3","state":"open"}

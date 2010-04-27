@@ -1,0 +1,1 @@
+{"title":"sync creates remote branch","tags":["open"],"date":"2010-03-30T10:12:31-06:00","author":"Simon Chiang <simon.chiang@pinnacol.com>","type":"issue","content":"As in:\r\n\r\n  git branch\r\n  (no origin/branch)\r\n\r\n  sync with origin/branch\r\n\r\n  git branch\r\n  origin/branch\r\n\r\n","at":"7a434ace49df8e7276ca0739b6bce272b4c654f1","state":"open"}

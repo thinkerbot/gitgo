@@ -1,0 +1,1 @@
+{"title":"Notice to start tracking remote/gitgo","tags":["open"],"date":"2009-11-13T16:04:28Z","author":"Simon Chiang <simon.chiang@pinnacol.com>","type":"issue","content":"There should be a clear, simple way to start tracking a remote gitgo branch when you first start up gitgo and there is no local gitgo branch.  This can be of the splash-page variety.","state":"open"}

@@ -1,0 +1,1 @@
+{"title":"Content-Type for downloading objects?","tags":["open"],"date":"2009-11-13T20:29:00Z","author":"Simon Chiang <simon.chiang@pinnacol.com>","type":"issue","content":"Check if there should be a special type of encoding when downloading objects through 'obj/sha?download=true', given that the text will often contain binary characters.\r\n","state":"open"}

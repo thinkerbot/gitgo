@@ -1,0 +1,1 @@
+{"title":"Gitgo merge","tags":["open"],"date":"2009-11-19T02:56:17Z","author":" <simon.a.chiang@gmail.com>","type":"issue","content":"Gitgo needs to notify when a repo needs to be or can be fast-forwarded, and then have methods to bring that about.","at":"7d16dd4422f3632e545cd1e8649337bec2ada2b3","state":"open"}

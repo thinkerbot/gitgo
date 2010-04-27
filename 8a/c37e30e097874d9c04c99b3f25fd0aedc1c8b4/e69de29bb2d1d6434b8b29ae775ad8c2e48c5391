@@ -1,0 +1,1 @@
+{"title":"Repo should warn for old versions of git","tags":["open"],"date":"2009-11-16T22:22:02Z","author":" <simon.a.chiang@gmail.com>","type":"issue","content":"The commit grep doesn't work on git version 1.6.0.1.  There should be detection and a warning when gitgo is on too old a git.","state":"open"}

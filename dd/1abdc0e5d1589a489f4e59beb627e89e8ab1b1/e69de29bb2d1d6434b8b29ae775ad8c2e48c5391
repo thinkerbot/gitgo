@@ -1,0 +1,1 @@
+{"title":"Strip out resource nesting","tags":["open"],"date":"2009-11-18T22:30:23Z","author":"Simon Chiang <simon.chiang@pinnacol.com>","type":"issue","content":"Resource nesting seemed like a good idea but really it's just a bit confusing.  Strip it down and present the full url in the path declarations.","at":"51f1762af0627db3f6bbd103a036682d173c6cdb","state":"open"}

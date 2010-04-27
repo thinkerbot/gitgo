@@ -1,0 +1,1 @@
+{"author":" <simon.a.chiang@gmail.com>","title":"Error for first issue in a repo before first commit","date":"2010-04-26T23:15:04-06:00","tags":["open"],"type":"issue","content":"code.. \r\n  Gitgo::Document::InvalidDocumentError\r\n\r\n    found 1 error:\r\n    at: misformatted (RuntimeError)","at":"83fb8ca77678cef98136ee4e577d2419e2cbc57b"}

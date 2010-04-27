@@ -1,0 +1,1 @@
+{"title":"Show tags support","tags":["open"],"date":"2009-11-13T18:16:52Z","author":"Simon Chiang <simon.chiang@pinnacol.com>","type":"issue","content":"Add support to show tags:\r\n\r\n  /tag/:tag\r\n  /obj/:tag\r\n","state":"open"}

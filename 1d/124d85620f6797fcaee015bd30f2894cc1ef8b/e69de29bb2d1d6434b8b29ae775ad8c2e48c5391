@@ -1,0 +1,1 @@
+{"title":"Checkout updates HEAD","tags":["open"],"date":"2009-11-16T22:19:17Z","author":"Simon Chiang <simon.chiang@pinnacol.com>","type":"issue","content":"The checkout method updates HEAD and index for the pwd.  I had hoped this would be solved by using the sandbox, but evidently it is not.","state":"open"}

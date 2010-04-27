@@ -1,0 +1,1 @@
+{"title":"Index update","tags":["open"],"date":"2009-11-13T16:02:42Z","author":"Simon Chiang <simon.chiang@pinnacol.com>","type":"issue","content":"Indexes need to be updated, probably on every restart, so that changes pulled in from the command line can be seen immediately.  This doesn't have to be painful if there is an incremental reindex available.","state":"open"}

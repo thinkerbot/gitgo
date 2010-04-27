@@ -1,0 +1,1 @@
+{"title":"Highlight added content from merge","tags":["open"],"date":"2009-11-18T22:34:43Z","author":"Simon Chiang <simon.chiang@pinnacol.com>","type":"issue","content":"This could be done with a special one-time index (or clearable index) that receives shas from a partial reindex.","at":"51f1762af0627db3f6bbd103a036682d173c6cdb","state":"open"}

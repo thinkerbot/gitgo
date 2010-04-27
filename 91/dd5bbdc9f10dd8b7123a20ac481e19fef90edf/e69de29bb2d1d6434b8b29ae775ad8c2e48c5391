@@ -1,0 +1,1 @@
+{"title":"Don't show non-index indexes","tags":["open"],"date":"2010-03-30T09:19:01-06:00","author":"Simon Chiang <simon.chiang@pinnacol.com>","type":"issue","content":"Right now cache and states (?) shows up and it can be a bit disorientating for them to go away on reindex. ","at":"7a434ace49df8e7276ca0739b6bce272b4c654f1","state":"open"}

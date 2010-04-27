@@ -1,0 +1,1 @@
+{"title":"Errno::EISDIR ","tags":["open"],"date":"2010-01-20T21:20:54Z","author":"Simon Chiang <simon.chiang@pinnacol.com>","type":"issue","content":"http://localhost:8080/issue/nw\r\n\r\n  Errno::EISDIR:\r\n  Message\r\n\r\n  Is a directory - /Users/Simon/Documents/Gems/gitgo/.git/objects/70/","at":"821b7a1ad4d566bf1ed3948ef7687762ac505d5d","state":"open"}

@@ -1,0 +1,1 @@
+{"title":"Better-than day resolution","tags":["open"],"date":"2009-11-16T23:59:11Z","author":"Simon Chiang <simon.chiang@pinnacol.com>","type":"issue","content":"Activity really should have better than day resolution.   This means updating timeline so that it reads in all items for that date, or caches and sorts beforehand much like comments.\r\n","state":"open"}

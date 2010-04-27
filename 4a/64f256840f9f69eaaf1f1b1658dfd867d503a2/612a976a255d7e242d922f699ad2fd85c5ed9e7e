@@ -1,0 +1,1 @@
+{"tags":["open"],"date":"2010-01-20T22:23:22Z","author":"Simon Chiang <simon.chiang@pinnacol.com>","type":"issue","content":"Actually, this appears to be a problem with correctly closing an issue.  One comment is open, the other is closed, and the issue is in both states.","at":"6d2ebf913f342f20c496ce8143a130a43c82d3da","state":"open"}

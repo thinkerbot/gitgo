@@ -1,0 +1,1 @@
+{"tags":["closed"],"date":"2010-01-20T21:54:18Z","author":"Simon Chiang <simon.chiang@pinnacol.com>","type":"issue","content":"I get why this was raising an error (I think) but I have no idea how to reproduce it for a test.  Fixed but not tested.","at":"ce3f921efb42bd4f42b7db4a25e20c7846ba9747","state":"closed"}

@@ -1,0 +1,1 @@
+{"title":"Resetting gitgo","tags":["open"],"date":"2009-12-31T18:25:11Z","author":"Simon Chiang <simon.chiang@pinnacol.com>","type":"issue","content":"There should be a way to completely reset gitgo (repo/reset?) such that if you upgrade and need to throw away the index and start over, you can.","at":"c7dbfc6cca9f78e3dd941d6e55126290240d7cc4","state":"open"}

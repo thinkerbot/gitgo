@@ -1,0 +1,1 @@
+{"title":"Form values -- escape_html?","tags":["open"],"date":"2010-01-27T16:57:32Z","author":"Simon Chiang <simon.chiang@pinnacol.com>","type":"issue","content":"Figure out what kind of escaping needs to be performed on form values and add it to Form#value","at":"499b3fc24591a83772fd67bc619d79924d6b4398","state":"open"}
