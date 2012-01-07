@@ -38,9 +38,9 @@ Combine searches as needed to get the desired results.
 Display
 ---------
 
-A summary of a thread can be seen by listing the head with the summary lines, much like a git-graph --oneline.  In fact you might be able to literally store objects as commits and just use that.  That would be pretty bad-ass.
+A summary of a thread can be seen by listing the head with the summary lines, much like a git-graph --oneline.  In fact you might be able to literally store objects as commits and just use that.  That would be pretty bad-ass.  You could translate each head into a branch, in a separate gitgo/git repo.  To add/update, you would commit to the issue branch and add to the gitgo branch.
 
-For when you want to only see the latest, you need to filter updates and deletes.  
+For when you want to only see the latest, you need to filter updates and deletes.  These unfortunately would have to be separate branches themselves.  And when you update/delete, the filter branch would have to be recreated.  Like a rebase.
 
 Update:
 
