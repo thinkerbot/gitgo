@@ -45,10 +45,10 @@ For when you want to only see the latest, you need to filter updates and deletes
 Update:
 
     A/B  (B)
-    A/B1 (A)
+    B/B1 (B)
 
-* delete line A/B
-* replace B/C with B1/C
+* replace A/B with A/B1
+* delete line B/B1
 
 Delete:
 
