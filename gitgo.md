@@ -19,9 +19,12 @@ Use a format similar to a commit for each vertex.
     
     body...
 
-Traverse each object and index by name, email, date (day granularity, utc), and tags.  The indexes allow quick searches for activity by a user, or tagged in a particular way.  Tags should include categories like 'issue' or 'page', as applicable.
+Traverse each object and index by name, email, date (day granularity, utc), and tags.  The indexes allow quick searches for activity by a user, or tagged in a particular way.  Tags should include categories like 'issue' or 'page', as applicable.  The indexes are files of shas, separated by lines.
 
+To search for:
 
+* A category - list all heads and find common lines (comm)
+* Activity   - grep index for input
+* Heads      - grep head files for sha
 
-
-
+Combine searches as needed to get the desired results.
