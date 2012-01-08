@@ -4,7 +4,7 @@ Gitgo
 Storage
 ---------
 
-Use the file system to describe the graph:
+Use the file system to describe a set of graphs:
 
     0/A (A) # vertex -- so each object is stored at least once
     A/B (B) # edge, link
@@ -38,22 +38,17 @@ Combine searches as needed to get the desired results.
 Display
 ---------
 
-A summary of a thread can be seen by listing the head with the summary lines, much like a git-graph --oneline.  In fact you might be able to literally store objects as commits and just use that.  That would be pretty bad-ass.  You could translate each head into a branch, in a separate gitgo/git repo.  To add/update, you would commit to the issue branch and add to the gitgo branch.
-
-For when you want to only see the latest, you need to filter updates and deletes.  These unfortunately would have to be separate branches themselves.  And when you update/delete, the filter branch would have to be recreated.  Like a rebase.
+The full graph can be deconvoluted so that updates and deletes are made current.  Once deconvoluted the graph can e written as a commit tree and inspected with normal git tools.  Expire the branch on updates to the issue. In the tree, track the issue content and attachments. Allow checkout of it in that way and thereby make the issue available in another way.  Further work on the branch is meaningless, however.
 
 Update:
 
     A/B  (B)
     B/B1 (B)
 
-* replace A/B with A/B1
-* delete line B/B1
+Replace A/B with A/B1 (sed).  B will no longer be accessible.
 
 Delete:
 
     A/A (A)
 
-* replace x/A with x/x
-
-This rule includes the A/A line - A is now a separate vertex, still accessible if desired but identifiable as a detached head because it has no head file.
+Replace x/A with x/x. This rule includes the A/A line - A is now a separate vertex, still accessible if desired but identifiable as a detached head because it has no head file.
