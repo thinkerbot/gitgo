@@ -13,14 +13,19 @@ Use the file system to describe a set of graphs:
 
 Print the tree to list the graph data. Tsort to order properly.  For each line if file A exists, append "A/B" and symlink B to A.  Otherwise create A, write A, and then continue.  For 0, append "A" (the all index).  Remove all symlinks and the result will be sorted graphs named for each head.  When displaying, these represent each thread or issue.  The files can receive any new edges, but will need to be sorted afterwards.
 
-Use a format similar to a commit for each vertex.
+Use a commit for each vertex, with a special format for the message.
 
+    tree
+    parent
     author name <email> date zone
-    tags a b c
-    
+        
     summary
     
     body...
+    
+    tag tag tag
+
+The commit tree points to a tree with any attachments in it.  The parent(s) identify commits in the main branches where the issue/comment applies.
 
 Searches
 ---------
