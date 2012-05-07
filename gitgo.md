@@ -1,6 +1,34 @@
 Gitgo
 =========
 
+Provides a mechanism to store issues in git and distribute them in a
+conflict-free way.
+
+Conversations are treated as directed acyclic graphs where each node is a
+statement in the conversation.  Nodes may only be added to the graphs, they may
+not be deleted or changed directly.  However, when nodes are added to the graph
+they may be flagged to replace or detach other nodes.  These flags may be used
+to deconvolute the graph such that replaced and detached nodes are not present,
+hence providing a mechanism to logically update and delete parts of the graph 
+without literally updating or removing nodes.
+
+During deconvolution a replacement node removes the replaced node from the 
+graph and inherits edges of the replaced node.  A detach node removes the
+detached node and any edges of the detached node.
+
+The conversation nodes are stored in a tree by checksum and tracked as normal 
+by commits in git, on a dedicated branch.  The add-only nature of the nodes 
+plus this format implies conflict-free merges.
+
+Nodes are formatted as commits so that they store their incoming edges and may 
+be processed with existing git plumbing.  The tree for each node can point toattchements for the statement, and the message format can contain additionalmetadata for the node.  Note that the commit format is entirely for processing 
+convenience.  Conversation nodes are tracked as blobs in the tree of the 
+dedicated branch, rather than with references.
+
+One application of this system is to allow distributed issue tracking.  Other
+conversations like wiki pages and code comments are likewise possible.
+
+
 Storage
 ---------
 
