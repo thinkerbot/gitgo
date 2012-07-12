@@ -1,0 +1,21 @@
+#!/usr/bin/vim -S
+
+;; pull out topography and article numbers
+v/^<tr/d
+%s/src/\rsrc/g
+%s/href/\rhref/g
+g/<tr/d
+%s/\v[> ].*//
+
+;; rebuilt the topography as text
+%s:src="/short/b+l.png":_:     ;; preserve spaces across the join
+%s:src="/short/I+l.png":| :
+%s:src="/short/T+l.png":|-:
+%s:src="/short/L+l.png":`-:
+%s:src="/short/k1+l.png"::
+%s:src="/short/k2+l.png"::
+%s:src="/short/s+l.png"::
+g/href/s/.*\/\(.*\)"/\1/
+g/^/,/^[0-9]/j
+%s/_/ /g                       ;; add the spaces back
+
