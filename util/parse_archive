@@ -1,48 +1,65 @@
-#!/usr/bin/vim -S
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"" Parses the gmane archive html into a textual topography
-""
-""   curl 'http://news.gmane.org/group/gmane.comp.version-control.git/last=0/force_load=very/?page=1856&action=--Action--' > 1856.html
-""   ./util/parse_archive 1856.html
-""
-"" Produces something like:
-""
-""   52
-""   |- 57
-""   | |- 61
-""   | `- 59
-""   |   |- 95
-""   |   | `- 1469
-""   |   |   |- 1501
-""   |   |   | |- 1571
-""   |   |   | | `- 1573
-""   |   |   | `- 1502
-""   |   |   `- 1471
-""   |   `- 110
-""   |     `- 114
-""   `- 118
-""     |- 185
-""     |- 127
-""     `- 119
-""
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+#!/bin/bash
+################################################################
+# Parses the gmane archive html into a textual topography
+#
+#   curl -s 'http://news.gmane.org/group/gmane.comp.version-control.git/last=0/force_load=very/?page=1856&action=--Action--' |
+#   ./util/parse_archive 
+#
+# Produces something like:
+#
+#   52
+#   |- 57
+#   | |- 61
+#   | `- 59
+#   |   |- 95
+#   |   | `- 1469
+#   |   |   |- 1501
+#   |   |   | |- 1571
+#   |   |   | | `- 1573
+#   |   |   | `- 1502
+#   |   |   `- 1471
+#   |   `- 110
+#   |     `- 114
+#   `- 118
+#     |- 185
+#     |- 127
+#     `- 119
+#
+################################################################
 
-"" pull out topography and article numbers
-v/^<tr/d
-%s/src/\rsrc/g
-%s/href/\rhref/g
-g/<tr/d
-%s/\v[> ].*//
+# pull out topography and article numbers
+sed -e '
+/^<tr/!d
+s/src/\
+src/g
+s/href/\
+href/g
+' |
 
-"" rebuilt the topography as text
-%s:src="/short/b+l.png":_:     "" preserve spaces across the join
-%s:src="/short/I+l.png":| :
-%s:src="/short/T+l.png":|-:
-%s:src="/short/L+l.png":`-:
-%s:src="/short/k1+l.png"::
-%s:src="/short/k2+l.png"::
-%s:src="/short/s+l.png"::
-g/href/s/.*\/\(.*\)"/\1/
-g/^/,/^[0-9]/j
-%s/_/ /g                       "" add the spaces back
+# rebuilt the topography as text
+sed -ne '
+/src/ {
+  s:src="/short/b+l.png".*: :
+  s:src="/short/I+l.png".*:| :
+  s:src="/short/T+l.png".*:|- :
+  s:src="/short/L+l.png".*:`- :
+  s:src="/short/k1+l.png".*::
+  s:src="/short/k2+l.png".*::
+  s:src="/short/s+l.png".*::
+  H
+}
+/href/ {
+  s/[^0-9]*\([0-9]*\)" .*">\(.*\)<\/a.*/\1 -- \2/
+  # join all the topography segments 
+  H
+  s/.*//
+  x
+  s/\n//g
+  # delimit threads with a newline
+  s/^\([0-9]\)/\
+\1/
+  # print it out!
+  p
+}
+'
 
