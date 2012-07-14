@@ -67,9 +67,7 @@ sed -ne '
   s:src="/short/I+l.png".*:|  :
   s:src="/short/T+l.png".*:|- :
   s:src="/short/L+l.png".*:`- :
-  s:src="/short/k1+l.png".*::
-  s:src="/short/k2+l.png".*::
-  s:src="/short/s+l.png".*::
+  s:src.*::
   H
 }
 /href/ {
@@ -89,16 +87,22 @@ sed -ne '
 
 # flatten the graph to arcs
 if [ "$arcs" == "true" ]
-then ruby -ne '
-if $_ =~ /^(.*?)(\d+)/
-  stack = (stack || []).shift($1.length / 3)
-  stack << $2
-  if tail = stack[-2, 2]
-    puts tail.join(" ")
+then ruby -e '
+stack = []
+while line = gets
+  if line =~ /^(.*?)(\d+)/
+    depth, num = ($1.length / 3), $2
+
+    while stack.length > depth
+      stack.pop
+    end
+    stack << num
+
+    if stack.length >= 2
+      puts "#{stack[-2]} #{stack[-1]}"
+    end
   end
 end
 '
 else cat
 fi
-
-
