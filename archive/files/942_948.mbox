@@ -1,0 +1,562 @@
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Junio C Hamano <junkio@cox.net>
+Subject: [PATCH 1/4] Accept commit in some places when tree is needed.
+Date: Tue, 19 Apr 2005 23:08:51 -0700
+Lines: 93
+Message-ID: <7vis2ikmj0.fsf@assigned-by-dhcp.cox.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Wed Apr 20 08:05:33 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DO8Ke-0006Im-2B
+	for gcvg-git@gmane.org; Wed, 20 Apr 2005 08:05:04 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S261426AbVDTGJO (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Wed, 20 Apr 2005 02:09:14 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S261428AbVDTGJN
+	(ORCPT <rfc822;git-outgoing>); Wed, 20 Apr 2005 02:09:13 -0400
+Received: from fed1rmmtao01.cox.net ([68.230.241.38]:12990 "EHLO
+	fed1rmmtao01.cox.net") by vger.kernel.org with ESMTP
+	id S261426AbVDTGI6 (ORCPT <rfc822;git@vger.kernel.org>);
+	Wed, 20 Apr 2005 02:08:58 -0400
+Received: from assigned-by-dhcp.cox.net ([68.4.60.172])
+          by fed1rmmtao01.cox.net
+          (InterMail vM.6.01.04.00 201-2131-118-20041027) with ESMTP
+          id <20050420060851.BLPV9923.fed1rmmtao01.cox.net@assigned-by-dhcp.cox.net>;
+          Wed, 20 Apr 2005 02:08:51 -0400
+To: Linus Torvalds <torvalds@osdl.org>
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+Similar to the diff-cache command, we should accept commit ID
+when tree ID is required but the end-user intent is unambiguous.
+
+This patch lifts the tree-from-tree-or-commit logic from
+diff-cache.c and moves it to sha1_file.c, which is a common
+library source for the SHA1 storage part.
+
+Signed-off-by: Junio C Hamano <junkio@cox.net>
+---
+
+ cache.h      |    1 +
+ diff-cache.c |   18 ++----------------
+ sha1_file.c  |   28 ++++++++++++++++++++++++++++
+ 3 files changed, 31 insertions(+), 16 deletions(-)
+
+Makefile: needs update
+--- a/cache.h
++++ b/cache.h
+@@ -124,5 +124,6 @@ extern void die(const char *err, ...);
+ extern int error(const char *err, ...);
+ 
+ extern int cache_name_compare(const char *name1, int len1, const char *name2, int len2);
++extern void *tree_from_tree_or_commit(unsigned char *sha1, char *type, unsigned long *size);
+ 
+ #endif /* CACHE_H */
+--- a/diff-cache.c
++++ b/diff-cache.c
+@@ -245,23 +245,9 @@ int main(int argc, char **argv)
+ 	if (argc != 2 || get_sha1_hex(argv[1], tree_sha1))
+ 		usage("diff-cache [-r] [-z] <tree sha1>");
+ 
++	tree = tree_from_tree_or_commit(tree_sha1, type, &size);
+ 	tree = read_sha1_file(tree_sha1, type, &size);
+ 	if (!tree)
+-		die("bad tree object %s", argv[1]);
+-
+-	/* We allow people to feed us a commit object, just because we're nice */
+-	if (!strcmp(type, "commit")) {
+-		/* tree sha1 is always at offset 5 ("tree ") */
+-		if (get_sha1_hex(tree + 5, tree_sha1))
+-			die("bad commit object %s", argv[1]);
+-		free(tree);
+-		tree = read_sha1_file(tree_sha1, type, &size);       
+-		if (!tree)
+-			die("unable to read tree object %s", sha1_to_hex(tree_sha1));
+-	}
+-
+-	if (strcmp(type, "tree"))
+-		die("bad tree object %s (%s)", sha1_to_hex(tree_sha1), type);
+-
++		die("cannot get tree object from %s", argv[1]);
+ 	return diff_cache(tree, size, active_cache, active_nr, "");
+ }
+--- a/sha1_file.c
++++ b/sha1_file.c
+@@ -245,3 +245,31 @@ int write_sha1_buffer(const unsigned cha
+ 	close(fd);
+ 	return 0;
+ }
++
++void *tree_from_tree_or_commit(unsigned char *sha1, char *type,
++			       unsigned long *size)
++{
++	void *tree = read_sha1_file(sha1, type, size);
++	if (!tree)
++		return tree;
++
++	/* We allow people to feed us a commit object,
++	 * just because we're nice.
++	 */
++	if (!strcmp(type, "commit")) {
++		/* tree sha1 is always at offset 5 ("tree ") */
++		if (get_sha1_hex(tree + 5, sha1)) {
++			free(tree);
++			return NULL;
++		}
++		free(tree);
++		tree = read_sha1_file(sha1, type, size);
++		if (!tree)
++			return NULL;
++	}
++	if (strcmp(type , "tree")) {
++		free(tree);
++		return NULL;
++	}
++	return tree;
++}
+
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Junio C Hamano <junkio@cox.net>
+Subject: [PATCH 2/4] Use tree_from_tree_or_commit() in read-tree.
+Date: Tue, 19 Apr 2005 23:09:24 -0700
+Lines: 30
+Message-ID: <7vekd6kmi3.fsf@assigned-by-dhcp.cox.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Wed Apr 20 08:06:56 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DO8Ly-0006Re-Ib
+	for gcvg-git@gmane.org; Wed, 20 Apr 2005 08:06:26 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S261428AbVDTGKH (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Wed, 20 Apr 2005 02:10:07 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S261431AbVDTGKH
+	(ORCPT <rfc822;git-outgoing>); Wed, 20 Apr 2005 02:10:07 -0400
+Received: from fed1rmmtao08.cox.net ([68.230.241.31]:33168 "EHLO
+	fed1rmmtao08.cox.net") by vger.kernel.org with ESMTP
+	id S261428AbVDTGJx (ORCPT <rfc822;git@vger.kernel.org>);
+	Wed, 20 Apr 2005 02:09:53 -0400
+Received: from assigned-by-dhcp.cox.net ([68.4.60.172])
+          by fed1rmmtao08.cox.net
+          (InterMail vM.6.01.04.00 201-2131-118-20041027) with ESMTP
+          id <20050420060924.WOKU18934.fed1rmmtao08.cox.net@assigned-by-dhcp.cox.net>;
+          Wed, 20 Apr 2005 02:09:24 -0400
+To: Linus Torvalds <torvalds@osdl.org>
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+This patch makes read-tree accept either tree or commit.
+
+Signed-off-by: Junio C Hamano <junkio@cox.net>
+---
+
+ read-tree.c |    4 +---
+ 1 files changed, 1 insertion(+), 3 deletions(-)
+
+Makefile: needs update
+--- a/read-tree.c
++++ b/read-tree.c
+@@ -29,11 +29,9 @@ static int read_tree(unsigned char *sha1
+ 	unsigned long size;
+ 	char type[20];
+ 
+-	buffer = read_sha1_file(sha1, type, &size);
++	buffer = tree_from_tree_or_commit(sha1, type, &size);
+ 	if (!buffer)
+ 		return -1;
+-	if (strcmp(type, "tree"))
+-		return -1;
+ 	while (size) {
+ 		int len = strlen(buffer)+1;
+ 		unsigned char *sha1 = buffer + len;
+
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Junio C Hamano <junkio@cox.net>
+Subject: [PATCH 3/4] Use tree_from_tree_or_commit() in diff-tree.
+Date: Tue, 19 Apr 2005 23:10:26 -0700
+Lines: 42
+Message-ID: <7v8y3ekmgd.fsf@assigned-by-dhcp.cox.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Wed Apr 20 08:07:07 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DO8MC-0006Tq-Tw
+	for gcvg-git@gmane.org; Wed, 20 Apr 2005 08:06:41 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S261431AbVDTGKs (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Wed, 20 Apr 2005 02:10:48 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S261433AbVDTGKs
+	(ORCPT <rfc822;git-outgoing>); Wed, 20 Apr 2005 02:10:48 -0400
+Received: from fed1rmmtao04.cox.net ([68.230.241.35]:61333 "EHLO
+	fed1rmmtao04.cox.net") by vger.kernel.org with ESMTP
+	id S261431AbVDTGK3 (ORCPT <rfc822;git@vger.kernel.org>);
+	Wed, 20 Apr 2005 02:10:29 -0400
+Received: from assigned-by-dhcp.cox.net ([68.4.60.172])
+          by fed1rmmtao04.cox.net
+          (InterMail vM.6.01.04.00 201-2131-118-20041027) with ESMTP
+          id <20050420061026.MSLT15592.fed1rmmtao04.cox.net@assigned-by-dhcp.cox.net>;
+          Wed, 20 Apr 2005 02:10:26 -0400
+To: Linus Torvalds <torvalds@osdl.org>
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+This patch makes diff-tree accept either tree or commit.
+
+Signed-off-by: Junio C Hamano <junkio@cox.net>
+---
+
+ diff-tree.c |   12 +++++++-----
+ 1 files changed, 7 insertions(+), 5 deletions(-)
+
+--- a/diff-tree.c
++++ b/diff-tree.c
+@@ -160,18 +160,20 @@ static int diff_tree(void *tree1, unsign
+ 	return 0;
+ }
+ 
+-static int diff_tree_sha1(const unsigned char *old, const unsigned char *new, const char *base)
++static int diff_tree_sha1(const unsigned char *old,
++			  const unsigned char *new,
++			  const char *base)
+ {
+ 	void *tree1, *tree2;
+ 	unsigned long size1, size2;
+ 	char type[20];
+ 	int retval;
+ 
+-	tree1 = read_sha1_file(old, type, &size1);
+-	if (!tree1 || strcmp(type, "tree"))
++	tree1 = tree_from_tree_or_commit(old, type, &size1);
++	if (!tree1)
+ 		die("unable to read source tree (%s)", sha1_to_hex(old));
+-	tree2 = read_sha1_file(new, type, &size2);
+-	if (!tree2 || strcmp(type, "tree"))
++	tree2 = tree_from_tree_or_commit(new, type, &size2);
++	if (!tree2)
+ 		die("unable to read destination tree (%s)", sha1_to_hex(new));
+ 	retval = diff_tree(tree1, size1, tree2, size2, base);
+ 	free(tree1);
+
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Junio C Hamano <junkio@cox.net>
+Subject: [PATCH 4/4] Use tree_from_tree_or_commit() in ls-tree.
+Date: Tue, 19 Apr 2005 23:11:00 -0700
+Lines: 28
+Message-ID: <7v4qe2kmff.fsf@assigned-by-dhcp.cox.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Wed Apr 20 08:07:21 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DO8MW-0006WG-IS
+	for gcvg-git@gmane.org; Wed, 20 Apr 2005 08:07:00 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S261433AbVDTGLJ (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Wed, 20 Apr 2005 02:11:09 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S261441AbVDTGLJ
+	(ORCPT <rfc822;git-outgoing>); Wed, 20 Apr 2005 02:11:09 -0400
+Received: from fed1rmmtao09.cox.net ([68.230.241.30]:33960 "EHLO
+	fed1rmmtao09.cox.net") by vger.kernel.org with ESMTP
+	id S261433AbVDTGLD (ORCPT <rfc822;git@vger.kernel.org>);
+	Wed, 20 Apr 2005 02:11:03 -0400
+Received: from assigned-by-dhcp.cox.net ([68.4.60.172])
+          by fed1rmmtao09.cox.net
+          (InterMail vM.6.01.04.00 201-2131-118-20041027) with ESMTP
+          id <20050420061101.JLYW19936.fed1rmmtao09.cox.net@assigned-by-dhcp.cox.net>;
+          Wed, 20 Apr 2005 02:11:01 -0400
+To: Linus Torvalds <torvalds@osdl.org>
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+This patch makes ls-tree accept either tree or commit.
+
+Signed-off-by: Junio C Hamano <junkio@cox.net>
+---
+
+ ls-tree.c |    2 +-
+ 1 files changed, 1 insertion(+), 1 deletion(-)
+
+Makefile: needs update
+cache.h: needs update
+sha1_file.c: needs update
+--- a/ls-tree.c
++++ b/ls-tree.c
+@@ -74,7 +74,7 @@ static int list(unsigned char *sha1)
+ 	unsigned long size;
+ 	char type[20];
+ 
+-	buffer = read_sha1_file(sha1, type, &size);
++	buffer = tree_from_tree_or_commit(sha1, type, &size);
+ 	if (!buffer)
+ 		die("unable to read sha1 file");
+ 	list_recursive(buffer, type, size, NULL);
+
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Junio C Hamano <junkio@cox.net>
+Subject: (fixed) [PATCH 1/4] Accept commit in some places when tree is
+ needed.
+Date: Tue, 19 Apr 2005 23:35:32 -0700
+Lines: 104
+Message-ID: <7vy8bej6q3.fsf@assigned-by-dhcp.cox.net>
+References: <7vis2ikmj0.fsf@assigned-by-dhcp.cox.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Wed Apr 20 08:32:04 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DO8kV-0000M1-Kc
+	for gcvg-git@gmane.org; Wed, 20 Apr 2005 08:31:47 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S261270AbVDTGf4 (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Wed, 20 Apr 2005 02:35:56 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S261338AbVDTGf4
+	(ORCPT <rfc822;git-outgoing>); Wed, 20 Apr 2005 02:35:56 -0400
+Received: from fed1rmmtao07.cox.net ([68.230.241.32]:49845 "EHLO
+	fed1rmmtao07.cox.net") by vger.kernel.org with ESMTP
+	id S261270AbVDTGfj (ORCPT <rfc822;git@vger.kernel.org>);
+	Wed, 20 Apr 2005 02:35:39 -0400
+Received: from assigned-by-dhcp.cox.net ([68.4.60.172])
+          by fed1rmmtao07.cox.net
+          (InterMail vM.6.01.04.00 201-2131-118-20041027) with ESMTP
+          id <20050420063533.HZVZ13104.fed1rmmtao07.cox.net@assigned-by-dhcp.cox.net>;
+          Wed, 20 Apr 2005 02:35:33 -0400
+To: Linus Torvalds <torvalds@osdl.org>
+In-Reply-To: <7vis2ikmj0.fsf@assigned-by-dhcp.cox.net> (Junio C. Hamano's
+ message of "Tue, 19 Apr 2005 23:08:51 -0700")
+User-Agent: Gnus/5.1007 (Gnus v5.10.7) Emacs/21.4 (gnu/linux)
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+<cover-paragraph>
+_BLUSH_  
+
+The 1/4 in the series was a buggy one I sent by mistake.  Please
+replace it with this fixed one.  The other three are OK.
+
+BTW, do you have a preferred patch-mail convention to mark the
+cover paragraph like this to be excluded from the commit log,
+like the three-dash one you mentioned to exclude the tail of
+the message?
+</cover-paragraph>
+
+Similar to diff-cache which was introduced recently, when the
+intent is obvious we should accept commit ID when tree ID is
+required.  This patch lifts the tree-from-tree-or-commit logic
+from diff-cache.c and moves it to sha1_file.c, which is a common
+library source for the SHA1 storage part.
+
+Signed-off-by: Junio C Hamano <junkio@cox.net>
+---
+
+ cache.h      |    1 +
+ diff-cache.c |   19 ++-----------------
+ sha1_file.c  |   29 +++++++++++++++++++++++++++++
+ 3 files changed, 32 insertions(+), 17 deletions(-)
+
+--- a/cache.h
++++ b/cache.h
+@@ -124,5 +124,6 @@ extern void die(const char *err, ...);
+ extern int error(const char *err, ...);
+ 
+ extern int cache_name_compare(const char *name1, int len1, const char *name2, int len2);
++extern void *tree_from_tree_or_commit(const unsigned char *sha1, char *type, unsigned long *size);
+ 
+ #endif /* CACHE_H */
+--- a/diff-cache.c
++++ b/diff-cache.c
+@@ -245,23 +245,8 @@ int main(int argc, char **argv)
+ 	if (argc != 2 || get_sha1_hex(argv[1], tree_sha1))
+ 		usage("diff-cache [-r] [-z] <tree sha1>");
+ 
+-	tree = read_sha1_file(tree_sha1, type, &size);
++	tree = tree_from_tree_or_commit(tree_sha1, type, &size);
+ 	if (!tree)
+-		die("bad tree object %s", argv[1]);
+-
+-	/* We allow people to feed us a commit object, just because we're nice */
+-	if (!strcmp(type, "commit")) {
+-		/* tree sha1 is always at offset 5 ("tree ") */
+-		if (get_sha1_hex(tree + 5, tree_sha1))
+-			die("bad commit object %s", argv[1]);
+-		free(tree);
+-		tree = read_sha1_file(tree_sha1, type, &size);       
+-		if (!tree)
+-			die("unable to read tree object %s", sha1_to_hex(tree_sha1));
+-	}
+-
+-	if (strcmp(type, "tree"))
+-		die("bad tree object %s (%s)", sha1_to_hex(tree_sha1), type);
+-
++		die("cannot get tree object from %s", argv[1]);
+ 	return diff_cache(tree, size, active_cache, active_nr, "");
+ }
+--- a/sha1_file.c
++++ b/sha1_file.c
+@@ -245,3 +245,32 @@ int write_sha1_buffer(const unsigned cha
+ 	close(fd);
+ 	return 0;
+ }
++
++void *tree_from_tree_or_commit(const unsigned char *sha1, char *type,
++			       unsigned long *size)
++{
++	void *tree = read_sha1_file(sha1, type, size);
++	if (!tree)
++		return tree;
++
++	/* We allow people to feed us a commit object,
++	 * just because we're nice.
++	 */
++	if (!strcmp(type, "commit")) {
++		/* tree sha1 is always at offset 5 ("tree ") */
++		char tree_sha1[20];
++		if (get_sha1_hex(tree + 5, tree_sha1)) {
++			free(tree);
++			return NULL;
++		}
++		free(tree);
++		tree = read_sha1_file(tree_sha1, type, size);
++		if (!tree)
++			return NULL;
++	}
++	if (strcmp(type , "tree")) {
++		free(tree);
++		return NULL;
++	}
++	return tree;
++}
+
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Linus Torvalds <torvalds@osdl.org>
+Subject: Re: [PATCH] write-tree performance problems
+Date: Tue, 19 Apr 2005 23:43:53 -0700 (PDT)
+Lines: 30
+Message-ID: <Pine.LNX.4.58.0504192337120.6467@ppc970.osdl.org>
+References: <200504191250.10286.mason@suse.com> <200504191708.23536.mason@suse.com>
+ <Pine.LNX.4.58.0504191420060.19286@ppc970.osdl.org> <200504192049.21947.mason@suse.com>
+Mime-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Wed Apr 20 08:38:01 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DO8qV-0000w6-Ch
+	for gcvg-git@gmane.org; Wed, 20 Apr 2005 08:37:59 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S261338AbVDTGmE (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Wed, 20 Apr 2005 02:42:04 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S261352AbVDTGmE
+	(ORCPT <rfc822;git-outgoing>); Wed, 20 Apr 2005 02:42:04 -0400
+Received: from fire.osdl.org ([65.172.181.4]:15314 "EHLO smtp.osdl.org")
+	by vger.kernel.org with ESMTP id S261338AbVDTGmA (ORCPT
+	<rfc822;git@vger.kernel.org>); Wed, 20 Apr 2005 02:42:00 -0400
+Received: from shell0.pdx.osdl.net (fw.osdl.org [65.172.181.6])
+	by smtp.osdl.org (8.12.8/8.12.8) with ESMTP id j3K6fus4027141
+	(version=TLSv1/SSLv3 cipher=EDH-RSA-DES-CBC3-SHA bits=168 verify=NO);
+	Tue, 19 Apr 2005 23:41:56 -0700
+Received: from localhost (shell0.pdx.osdl.net [10.9.0.31])
+	by shell0.pdx.osdl.net (8.13.1/8.11.6) with ESMTP id j3K6fsku022625;
+	Tue, 19 Apr 2005 23:41:55 -0700
+To: Chris Mason <mason@suse.com>
+In-Reply-To: <200504192049.21947.mason@suse.com>
+X-Spam-Status: No, hits=0 required=5 tests=
+X-Spam-Checker-Version: SpamAssassin 2.63-osdl_revision__1.35__
+X-MIMEDefang-Filter: osdl$Revision: 1.109 $
+X-Scanned-By: MIMEDefang 2.36
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+
+
+On Tue, 19 Apr 2005, Chris Mason wrote:
+> 
+> I'll finish off the patch once you ok the basics below.  My current code works 
+> like this:
+
+Chris, before you do anything further, let me re-consider.
+
+Assuming that the real cost of write-tree is the compression (and I think
+it is), I really suspect that this ends up being the death-knell to my
+"use the sha1 of the _compressed_ object" approach. I thought it was
+clever, and I was ready to ignore the other arguments against it, but if
+it turns out that we can speed up write-tree a lot by just doing the SHA1
+on the uncompressed data, and noticing that we already have the tree
+before we need to compress it and write it out, then that may be a good
+enough reason for me to just admit that I was wrong about that decision.
+
+So I'll see if I can turn the current fsck into a "convert into
+uncompressed format", and do a nice clean format conversion. 
+
+Most of git is very format-agnostic, so that shouldn't be that painful. 
+Knock wood.
+
+			Linus
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+

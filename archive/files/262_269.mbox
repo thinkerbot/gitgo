@@ -1,0 +1,619 @@
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Linus Torvalds <torvalds@osdl.org>
+Subject: Re: Re: Re: write-tree is pasky-0.4
+Date: Fri, 15 Apr 2005 17:22:45 -0700 (PDT)
+Lines: 50
+Message-ID: <Pine.LNX.4.58.0504151709180.7211@ppc970.osdl.org>
+References: <20050414233159.GX22699@pasky.ji.cz> <7v7jj4q2j2.fsf@assigned-by-dhcp.cox.net>
+ <20050414223039.GB28082@64m.dyndns.org> <7vfyxsmqmk.fsf@assigned-by-dhcp.cox.net>
+ <20050415062807.GA29841@64m.dyndns.org> <7vfyxsi9bq.fsf@assigned-by-dhcp.cox.net>
+ <7vaco0i3t9.fsf_-_@assigned-by-dhcp.cox.net> <Pine.LNX.4.58.0504151138490.7211@ppc970.osdl.org>
+ <20050415185624.GB7417@pasky.ji.cz> <Pine.LNX.4.58.0504151212160.7211@ppc970.osdl.org>
+ <20050415223648.GP7417@pasky.ji.cz>
+Mime-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: Junio C Hamano <junkio@cox.net>, git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Sat Apr 16 02:17:45 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DMb0B-0003hL-It
+	for gcvg-git@gmane.org; Sat, 16 Apr 2005 02:17:35 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S262487AbVDPAVF (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Fri, 15 Apr 2005 20:21:05 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S262489AbVDPAVE
+	(ORCPT <rfc822;git-outgoing>); Fri, 15 Apr 2005 20:21:04 -0400
+Received: from fire.osdl.org ([65.172.181.4]:21124 "EHLO smtp.osdl.org")
+	by vger.kernel.org with ESMTP id S262487AbVDPAUy (ORCPT
+	<rfc822;git@vger.kernel.org>); Fri, 15 Apr 2005 20:20:54 -0400
+Received: from shell0.pdx.osdl.net (fw.osdl.org [65.172.181.6])
+	by smtp.osdl.org (8.12.8/8.12.8) with ESMTP id j3G0Kls4015675
+	(version=TLSv1/SSLv3 cipher=EDH-RSA-DES-CBC3-SHA bits=168 verify=NO);
+	Fri, 15 Apr 2005 17:20:48 -0700
+Received: from localhost (shell0.pdx.osdl.net [10.9.0.31])
+	by shell0.pdx.osdl.net (8.13.1/8.11.6) with ESMTP id j3G0KkDe024731;
+	Fri, 15 Apr 2005 17:20:47 -0700
+To: Petr Baudis <pasky@ucw.cz>
+In-Reply-To: <20050415223648.GP7417@pasky.ji.cz>
+X-Spam-Status: No, hits=0 required=5 tests=
+X-Spam-Checker-Version: SpamAssassin 2.63-osdl_revision__1.35__
+X-MIMEDefang-Filter: osdl$Revision: 1.109 $
+X-Scanned-By: MIMEDefang 2.36
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+
+
+On Sat, 16 Apr 2005, Petr Baudis wrote:
+> 
+> But otherwise it is great news to me. Actually, in that case, is it
+> worth renaming it to Cogito and using cg to invoke it? Wouldn't be that
+> actually more confusing after it gets merged? IOW, should I stick to
+> "git" or feel free to rename it to "cg"?
+
+I'm perfectly happy for it to stay as "git", and in general I don't have
+any huge preferences either way. You guys can discuss names as much as you
+like, it's the "tracking renames" and "how to merge" things that worry me.
+
+I think I've explained my name tracking worries.  When it comes to "how to 
+merge", there's three issues:
+
+ - we do commonly have merge clashes where both trees have applied the 
+   exact same patch. That should merge perfectly well using the 3-way
+   merge from a common parent that Junio has, but not your current "bring
+   patches forward" kind of strategy.
+ - I _do_ actually sometimes merge with dirty state in my working 
+   directory, which is why I want the merge to take place in a separate 
+   (and temporary) directory, which allows for a failed merge without 
+   having any major cleanup. If the merge fails, it's not a big deal, and 
+   I can just blow the merge directory away without losing the work I had 
+   in my "real" working directory.
+ - reliability. I care much less for "clever" than I care for "guaranteed 
+   to never do the wrong thing". If I have to fix up some stuff by hand, 
+   I'll happily do so. But if I can't trust the merge and have to _check_ 
+   things by hand afterwards, that will make me leery of the merges, and
+   _that_ is bad.
+
+The third point is why I'm going to the ultra-conservative "three-way 
+merge from the common parent". It's not fancy, but it's something I feel 
+comfortable with as a merge strategy. For example, arch (and in particular 
+darcs) seems to want to try to be "clever" about the merges, and I'd 
+always live in fear. 
+
+And, finally, there's obviously performance. I _think_ a normal merge with
+nary a conflict and just a few tens of files changed should be possible in
+a second. I realize that sounds crazy to some people, but I think it's
+entirely doable. Half of that is writing the new tree out (that is a
+relative costly op due to the compression). The other half is the "work".
+
+		Linus
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Linus Torvalds <torvalds@osdl.org>
+Subject: RE: Merge with git-pasky II.
+Date: Fri, 15 Apr 2005 17:32:13 -0700 (PDT)
+Lines: 49
+Message-ID: <Pine.LNX.4.58.0504151723530.7211@ppc970.osdl.org>
+References: <000701c5420e$e89177b0$6400a8c0@gandalf>
+Mime-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Sat Apr 16 02:27:10 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DMb9S-0004RN-E1
+	for gcvg-git@gmane.org; Sat, 16 Apr 2005 02:27:10 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S262489AbVDPAa2 (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Fri, 15 Apr 2005 20:30:28 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S262491AbVDPAa2
+	(ORCPT <rfc822;git-outgoing>); Fri, 15 Apr 2005 20:30:28 -0400
+Received: from fire.osdl.org ([65.172.181.4]:59526 "EHLO smtp.osdl.org")
+	by vger.kernel.org with ESMTP id S262489AbVDPAaT (ORCPT
+	<rfc822;git@vger.kernel.org>); Fri, 15 Apr 2005 20:30:19 -0400
+Received: from shell0.pdx.osdl.net (fw.osdl.org [65.172.181.6])
+	by smtp.osdl.org (8.12.8/8.12.8) with ESMTP id j3G0UGs4016855
+	(version=TLSv1/SSLv3 cipher=EDH-RSA-DES-CBC3-SHA bits=168 verify=NO);
+	Fri, 15 Apr 2005 17:30:17 -0700
+Received: from localhost (shell0.pdx.osdl.net [10.9.0.31])
+	by shell0.pdx.osdl.net (8.13.1/8.11.6) with ESMTP id j3G0UFYs025049;
+	Fri, 15 Apr 2005 17:30:15 -0700
+To: Barry Silverman <barry@disus.com>
+In-Reply-To: <000701c5420e$e89177b0$6400a8c0@gandalf>
+X-Spam-Status: No, hits=0 required=5 tests=
+X-Spam-Checker-Version: SpamAssassin 2.63-osdl_revision__1.35__
+X-MIMEDefang-Filter: osdl$Revision: 1.109 $
+X-Scanned-By: MIMEDefang 2.36
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+
+
+On Fri, 15 Apr 2005, Barry Silverman wrote:
+>
+> The issue I am trying to come to grips with in the current design, is
+> that the git repository of a number of interrelated projects will soon
+> become the logical OR of all blobs, commits, and trees in ALL the
+> projects. 
+
+Nope. I'm actually against the notion of sharing object directories
+between projects. The git model _allows_ it, and I think it can be a valid 
+approach, but it's absolutely not an approach that I would personally 
+suggest be used for the kernel.
+
+In other words, the default git behaviour - and the one I personally am a 
+proponent of - is to have one object directory per work tree, and really 
+consider all such trees independent. Then you can merge between trees if 
+you want to, and bring in objects that way, but normally you would _not_ 
+have tons of objects from other trees, and _especially_ not from other 
+unrelated projects.
+
+The reason git supports shared object archives is that (a) it falls out 
+trivially as part of the design, so not allowing it is silly and (b) it is 
+part of a merge, where you _do_ want to get the objects of the trees you 
+merge, and in particular you need to generate a seperate tree that has all 
+those objects without having to copy them.
+
+(Before you do the merge, you need to bring the new objects into your 
+repository of course, but that I consider to be a separate issue, not 
+part of the actual technical merge process).
+
+So normally, you'd probably have a totally pruned tree, with only the 
+objects you need (and you might even consider the "commit parent links" 
+less than necessary, especially if you're just a regular user and not a 
+developer who wants to merge).
+
+But the ability to have extra objects is wonderful. It makes going
+backwards in time basically free (while the equivalent "bk undo" in the BK
+world is a very expensive operation), and it makes it easy to
+incrementally keep up-to-date with trees that you know you're _eventually_
+going to merge with. But it's not an excuse to put just any random crap in 
+that object directory..
+
+		Linus
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Morten Welinder <mwelinder@gmail.com>
+Subject: [PATCH] write_sha1_buffer
+Date: Fri, 15 Apr 2005 20:50:06 -0400
+Lines: 29
+Message-ID: <118833cc05041517502fa52a89@mail.gmail.com>
+Reply-To: Morten Welinder <mwelinder@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+X-From: git-owner@vger.kernel.org Sat Apr 16 02:47:08 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DMbSZ-00067x-D2
+	for gcvg-git@gmane.org; Sat, 16 Apr 2005 02:46:55 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S262495AbVDPAuM (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Fri, 15 Apr 2005 20:50:12 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S262497AbVDPAuM
+	(ORCPT <rfc822;git-outgoing>); Fri, 15 Apr 2005 20:50:12 -0400
+Received: from rproxy.gmail.com ([64.233.170.193]:58970 "EHLO rproxy.gmail.com")
+	by vger.kernel.org with ESMTP id S262495AbVDPAuH convert rfc822-to-8bit
+	(ORCPT <rfc822;git@vger.kernel.org>);
+	Fri, 15 Apr 2005 20:50:07 -0400
+Received: by rproxy.gmail.com with SMTP id a41so737039rng
+        for <git@vger.kernel.org>; Fri, 15 Apr 2005 17:50:06 -0700 (PDT)
+DomainKey-Signature: a=rsa-sha1; q=dns; c=nofws;
+        s=beta; d=gmail.com;
+        h=received:message-id:date:from:reply-to:to:subject:mime-version:content-type:content-transfer-encoding:content-disposition;
+        b=a8WrT1OwkqFJCpJPlpu7j58141cWRYNwzpq/vZRYaz8GrEn7kN9aDJl+MpFdCN5Tzkm6rf0in8nupNupaWOOl/rx3IitIc4Ei3WOmFIwCNDuXmuY3eUUnTCx5la8K5vXWPBWEvZA9J6GoIQucjfAWhoTWhHx8aAtC9T22Q4bhwI=
+Received: by 10.38.86.53 with SMTP id j53mr3663546rnb;
+        Fri, 15 Apr 2005 17:50:06 -0700 (PDT)
+Received: by 10.38.76.77 with HTTP; Fri, 15 Apr 2005 17:50:06 -0700 (PDT)
+To: git@vger.kernel.org, torvalds@osdl.org
+Content-Disposition: inline
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+This write will failing sooner or later when someone's disk fills up. 
+That'll leave someone with
+a truncated file.
+
+Signed-off-by: Morten Welinder <mwelinder@gmail.com>
+
+
+--- read-cache.c
++++ read-cache.c        2005-04-15 20:32:52.111187168 -0400
+@@ -276,9 +276,13 @@
+                                        " This is bad, bad, BAD!\a\n");
+                return 0;
+        }
+-       write(fd, buf, size);
+-       close(fd);
+-       return 0;
++
++       if (write(fd, buf, size) != size) {
++               close(fd);
++               return error("Failed to write file %s\n", filename);
++       }
++
++       return close(fd);
+ }
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Scott Wright <sjw@spankyboy.net>
+Subject: (unknown)
+Date: Fri, 15 Apr 2005 20:51:11 -0400
+Lines: 6
+Message-ID: <200504152051.11813.sjw@spankyboy.net>
+Mime-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-From: git-owner@vger.kernel.org Sat Apr 16 02:47:52 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DMbTG-0006BN-7U
+	for gcvg-git@gmane.org; Sat, 16 Apr 2005 02:47:38 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S262497AbVDPAvM (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Fri, 15 Apr 2005 20:51:12 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S262499AbVDPAvM
+	(ORCPT <rfc822;git-outgoing>); Fri, 15 Apr 2005 20:51:12 -0400
+Received: from [68.212.236.68] ([68.212.236.68]:25744 "EHLO
+	shuttle.spankyboy.net") by vger.kernel.org with ESMTP
+	id S262497AbVDPAvM (ORCPT <rfc822;git@vger.kernel.org>);
+	Fri, 15 Apr 2005 20:51:12 -0400
+Received: by shuttle.spankyboy.net (Postfix, from userid 1001)
+	id DFEB9D4068; Fri, 15 Apr 2005 20:51:11 -0400 (EDT)
+To: git@vger.kernel.org
+User-Agent: KMail/1.7.1
+Content-Disposition: inline
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+subscribe git
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Linus Torvalds <torvalds@osdl.org>
+Subject: Re: [PATCH 3/2] merge-trees script for Linus git
+Date: Fri, 15 Apr 2005 18:02:07 -0700 (PDT)
+Lines: 28
+Message-ID: <Pine.LNX.4.58.0504151755590.7211@ppc970.osdl.org>
+References: <Pine.LNX.4.58.0504140201130.7211@ppc970.osdl.org>
+ <7vvf6pr4oq.fsf@assigned-by-dhcp.cox.net> <20050414121624.GZ25711@pasky.ji.cz>
+ <7vll7lqlbg.fsf@assigned-by-dhcp.cox.net> <20050414193507.GA22699@pasky.ji.cz>
+ <7vmzs1osv1.fsf@assigned-by-dhcp.cox.net> <20050414233159.GX22699@pasky.ji.cz>
+ <7v7jj4q2j2.fsf@assigned-by-dhcp.cox.net> <20050414223039.GB28082@64m.dyndns.org>
+ <7vfyxsmqmk.fsf@assigned-by-dhcp.cox.net> <20050415062807.GA29841@64m.dyndns.org>
+ <7vfyxsi9bq.fsf@assigned-by-dhcp.cox.net> <7vaco0i3t9.fsf_-_@assigned-by-dhcp.cox.net>
+ <Pine.LNX.4.58.0504151138490.7211@ppc970.osdl.org> <7vmzrzhkd3.fsf@assigned-by-dhcp.cox.net>
+ <7vfyxrhfsw.fsf_-_@assigned-by-dhcp.cox.net> <7vmzrzfwe4.fsf_-_@assigned-by-dhcp.cox.net>
+Mime-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Sat Apr 16 02:57:06 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DMbcN-0006uc-49
+	for gcvg-git@gmane.org; Sat, 16 Apr 2005 02:57:03 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S262499AbVDPBAU (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Fri, 15 Apr 2005 21:00:20 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S262503AbVDPBAU
+	(ORCPT <rfc822;git-outgoing>); Fri, 15 Apr 2005 21:00:20 -0400
+Received: from fire.osdl.org ([65.172.181.4]:5520 "EHLO smtp.osdl.org")
+	by vger.kernel.org with ESMTP id S262499AbVDPBAP (ORCPT
+	<rfc822;git@vger.kernel.org>); Fri, 15 Apr 2005 21:00:15 -0400
+Received: from shell0.pdx.osdl.net (fw.osdl.org [65.172.181.6])
+	by smtp.osdl.org (8.12.8/8.12.8) with ESMTP id j3G109s4020511
+	(version=TLSv1/SSLv3 cipher=EDH-RSA-DES-CBC3-SHA bits=168 verify=NO);
+	Fri, 15 Apr 2005 18:00:10 -0700
+Received: from localhost (shell0.pdx.osdl.net [10.9.0.31])
+	by shell0.pdx.osdl.net (8.13.1/8.11.6) with ESMTP id j3G108pi026119;
+	Fri, 15 Apr 2005 18:00:09 -0700
+To: Junio C Hamano <junkio@cox.net>
+In-Reply-To: <7vmzrzfwe4.fsf_-_@assigned-by-dhcp.cox.net>
+X-Spam-Status: No, hits=0 required=5 tests=
+X-Spam-Checker-Version: SpamAssassin 2.63-osdl_revision__1.35__
+X-MIMEDefang-Filter: osdl$Revision: 1.109 $
+X-Scanned-By: MIMEDefang 2.36
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+
+
+On Fri, 15 Apr 2005, Junio C Hamano wrote:
+> 
+>     the merge-trees I sent you earlier was expecting the old
+> diff-tree behaviour, and I did not realize that I need an
+> explicit -z flag now.
+
+You didn't need one - I just didn't want to merge your "ls-tree" change
+without making things be consistent. Once we started using the "-z" flag 
+for ls-tree, it just didn't make any sense not to do the same thing for 
+diff-tree.
+
+Just a heads-up - I'd really want to do the same thing to "merge-tree.c" 
+too, but since you said that you were working on extending that to do 
+recursion etc, I decided to hold off. So if you're working on it, maybe 
+you can add the "-z" flag there too? 
+
+I'm actually holding off merging the perl version exactly because you 
+seemed to be working on the C version. I don't mind perl per se, but if 
+there's a real solution coming down the line..
+
+		Linus
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Daniel Barkalow <barkalow@iabervon.org>
+Subject: Re: Re: Re: write-tree is pasky-0.4
+Date: Fri, 15 Apr 2005 21:13:05 -0400 (EDT)
+Lines: 75
+Message-ID: <Pine.LNX.4.21.0504152029410.30848-100000@iabervon.org>
+References: <Pine.LNX.4.58.0504151709180.7211@ppc970.osdl.org>
+Mime-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: Petr Baudis <pasky@ucw.cz>, Junio C Hamano <junkio@cox.net>,
+	git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Sat Apr 16 03:09:42 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DMboW-0007a5-2T
+	for gcvg-git@gmane.org; Sat, 16 Apr 2005 03:09:36 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S262510AbVDPBNK (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Fri, 15 Apr 2005 21:13:10 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S262504AbVDPBNK
+	(ORCPT <rfc822;git-outgoing>); Fri, 15 Apr 2005 21:13:10 -0400
+Received: from iabervon.org ([66.92.72.58]:20996 "EHLO iabervon.org")
+	by vger.kernel.org with ESMTP id S262510AbVDPBNC (ORCPT
+	<rfc822;git@vger.kernel.org>); Fri, 15 Apr 2005 21:13:02 -0400
+Received: from barkalow (helo=localhost)
+	by iabervon.org with local-esmtp (Exim 2.12 #2)
+	id 1DMbrt-0000rJ-00; Fri, 15 Apr 2005 21:13:05 -0400
+To: Linus Torvalds <torvalds@osdl.org>
+In-Reply-To: <Pine.LNX.4.58.0504151709180.7211@ppc970.osdl.org>
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+On Fri, 15 Apr 2005, Linus Torvalds wrote:
+
+> I think I've explained my name tracking worries.  When it comes to "how to 
+> merge", there's three issues:
+> 
+>  - we do commonly have merge clashes where both trees have applied the 
+>    exact same patch. That should merge perfectly well using the 3-way
+>    merge from a common parent that Junio has, but not your current "bring
+>    patches forward" kind of strategy.
+
+I think 3-way merge is probably the best starting point, but I think that
+there might be value in being able to identify the commits of each side
+involved in a conflict. I think this would help with cases where both
+sides pick up an identical patch, and then each side makes a further
+change to a different part of the changed region (you find out that the
+other guy's change was supposed to follow the patch, and don't conflict
+with it).
+
+>  - I _do_ actually sometimes merge with dirty state in my working 
+>    directory, which is why I want the merge to take place in a separate 
+>    (and temporary) directory, which allows for a failed merge without 
+>    having any major cleanup. If the merge fails, it's not a big deal, and 
+>    I can just blow the merge directory away without losing the work I had 
+>    in my "real" working directory.
+
+Is there some reason you don't commit before merging? All of the current
+merge theory seems to want to merge two commits, using the information git
+keeps about them. It should be cheap to get a new clean working directory
+to merge in, too, particularly if we add a cache of hardlinkable expanded
+blobs.
+
+>  - reliability. I care much less for "clever" than I care for "guaranteed 
+>    to never do the wrong thing". If I have to fix up some stuff by hand, 
+>    I'll happily do so. But if I can't trust the merge and have to _check_ 
+>    things by hand afterwards, that will make me leery of the merges, and
+>    _that_ is bad.
+> 
+> The third point is why I'm going to the ultra-conservative "three-way 
+> merge from the common parent". It's not fancy, but it's something I feel 
+> comfortable with as a merge strategy. For example, arch (and in particular 
+> darcs) seems to want to try to be "clever" about the merges, and I'd 
+> always live in fear. 
+
+How much do you care about the situation where there is no best common
+ancestor (which can happen if you're merging two main lines, each of which
+has merged with both of a pair of minor trees)? I think that arch is even
+more conservative, in that it doesn't look for a common ancestor, and
+reports conflicts whenever changes overlap at all. Of course, reliability
+by virtue of never working without help is not a big win over living in
+fear; you always have to check over it, not because you're afraid, but
+because it needs you to.
+
+> And, finally, there's obviously performance. I _think_ a normal merge with
+> nary a conflict and just a few tens of files changed should be possible in
+> a second. I realize that sounds crazy to some people, but I think it's
+> entirely doable. Half of that is writing the new tree out (that is a
+> relative costly op due to the compression). The other half is the "work".
+
+I think that the time spent on I/O will be overwhelmed by the time spent
+issuing the command at that rate. It might matter if you start getting
+into merging lots of things at once, but that's more like a minute for a
+merge group with 600 changes rather than a second per merge; we could
+potentially save a lot of time based of having a bunch of information left
+over from the previous merge when starting merge number 2. So 15 seconds
+plus half a second per merge might be better than a second per merge in
+the case that matters.
+
+	-Daniel
+*This .sig left intentionally blank*
+
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Junio C Hamano <junkio@cox.net>
+Subject: [PATCH] Add '-z' to merge-tree.c
+Date: Fri, 15 Apr 2005 18:17:57 -0700
+Lines: 82
+Message-ID: <7vekdbfrju.fsf@assigned-by-dhcp.cox.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Sat Apr 16 03:14:41 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DMbtO-0007y6-Jw
+	for gcvg-git@gmane.org; Sat, 16 Apr 2005 03:14:38 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S262517AbVDPBSK (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Fri, 15 Apr 2005 21:18:10 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S262524AbVDPBSK
+	(ORCPT <rfc822;git-outgoing>); Fri, 15 Apr 2005 21:18:10 -0400
+Received: from fed1rmmtao06.cox.net ([68.230.241.33]:39605 "EHLO
+	fed1rmmtao06.cox.net") by vger.kernel.org with ESMTP
+	id S262517AbVDPBR7 (ORCPT <rfc822;git@vger.kernel.org>);
+	Fri, 15 Apr 2005 21:17:59 -0400
+Received: from assigned-by-dhcp.cox.net ([68.4.60.172])
+          by fed1rmmtao06.cox.net
+          (InterMail vM.6.01.04.00 201-2131-118-20041027) with ESMTP
+          id <20050416011758.QGDM1497.fed1rmmtao06.cox.net@assigned-by-dhcp.cox.net>;
+          Fri, 15 Apr 2005 21:17:58 -0400
+To: Linus Torvalds <torvalds@osdl.org>
+User-Agent: Gnus/5.1007 (Gnus v5.10.7) Emacs/21.4 (gnu/linux)
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+Linus,
+
+    this adds '-z' to merge-tree and changes its default line
+termination to LF to make it consistent with your other recent
+changes.
+
+The patch is against
+    commit 028c5948257e763b3deb391e567b624eb7975ec2
+    tree   6b866e10b16183e630db8449c64899f6810d4270
+
+Signed-off-by: Junio C Hamano <junkio@cox.net>
+---
+ merge-tree.c |   23 ++++++++++++++++++++---
+ 1 files changed, 20 insertions(+), 3 deletions(-)
+
+--- ,,linus/merge-tree.c	2005-04-15 18:09:29.000000000 -0700
++++ ./merge-tree.c	2005-04-15 17:55:42.000000000 -0700
+@@ -1,5 +1,7 @@
+ #include "cache.h"
+ 
++static int line_termination = '\n';
++
+ struct tree_entry {
+ 	unsigned mode;
+ 	unsigned char *sha1;
+@@ -35,7 +37,8 @@ static struct tree_entry *read_tree(unsi
+ 
+ static void show(const struct tree_entry *a, const char *path)
+ {
+-	printf("select %o %s %s%c", a->mode, sha1_to_hex(a->sha1), path, 0);
++	printf("select %o %s %s%c", a->mode, sha1_to_hex(a->sha1), path,
++	       line_termination);
+ }
+ 
+ static void merge(const struct tree_entry *a, const struct tree_entry *b, const struct tree_entry *c, const char *path)
+@@ -46,7 +49,7 @@ static void merge(const struct tree_entr
+ 	strcpy(hex_c, sha1_to_hex(c->sha1));
+ 	printf("merge %o->%o,%o %s->%s,%s %s%c",
+ 		a->mode, b->mode, c->mode,
+-		hex_a, hex_b, hex_c, path, 0);
++		hex_a, hex_b, hex_c, path, line_termination);
+ }
+ 
+ static int same(const struct tree_entry *a, const struct tree_entry *b)
+@@ -114,15 +117,29 @@ static void merge_tree(struct tree_entry
+ 	}
+ }
+ 
++static const char *merge_tree_usage =
++    "merge-tree [-z] <src> <dst1> <dst2>";
++
+ int main(int argc, char **argv)
+ {
+ 	unsigned char src[20], dst1[20], dst2[20];
+ 
++	while ((1 < argc) && argv[1][0] == '-') {
++		switch (argv[1][1]) {
++		case 'z':
++			line_termination = 0;
++			break;
++		default:
++			usage(merge_tree_usage);
++		}
++		argc--; argv++;
++	}
++
+ 	if (argc != 4 ||
+ 	    get_sha1_hex(argv[1], src) ||
+ 	    get_sha1_hex(argv[2], dst1) ||
+ 	    get_sha1_hex(argv[3], dst2))
+-		usage("merge-tree <src> <dst1> <dst2>");
++		usage(merge_tree_usage);
+ 	merge_tree(read_tree(src), read_tree(dst1), read_tree(dst2));
+ 	return 0;
+ }
+
+
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+

@@ -1,0 +1,669 @@
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Junio C Hamano <junkio@cox.net>
+Subject: [PATCH] Better error message from checkout-cache for unmerged
+ files.
+Date: Sun, 17 Apr 2005 02:00:44 -0700
+Lines: 38
+Message-ID: <7vvf6lzsjn.fsf@assigned-by-dhcp.cox.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Sun Apr 17 10:57:18 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DN5ad-00034w-Jy
+	for gcvg-git@gmane.org; Sun, 17 Apr 2005 10:57:15 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S261290AbVDQJAz (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Sun, 17 Apr 2005 05:00:55 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S261291AbVDQJAz
+	(ORCPT <rfc822;git-outgoing>); Sun, 17 Apr 2005 05:00:55 -0400
+Received: from fed1rmmtao06.cox.net ([68.230.241.33]:23462 "EHLO
+	fed1rmmtao06.cox.net") by vger.kernel.org with ESMTP
+	id S261290AbVDQJAq (ORCPT <rfc822;git@vger.kernel.org>);
+	Sun, 17 Apr 2005 05:00:46 -0400
+Received: from assigned-by-dhcp.cox.net ([68.4.60.172])
+          by fed1rmmtao06.cox.net
+          (InterMail vM.6.01.04.00 201-2131-118-20041027) with ESMTP
+          id <20050417090044.DKLA1497.fed1rmmtao06.cox.net@assigned-by-dhcp.cox.net>;
+          Sun, 17 Apr 2005 05:00:44 -0400
+To: Linus Torvalds <torvalds@osdl.org>
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+The checkout-cache command says "file is not in the cache" when
+an unmerged path is given.  This patch adds code to distinguish
+the unmerged and the nonexistent cases and gives an appropriate
+error message.
+
+Signed-off-by: Junio C Hamano <junkio@cox.net>
+---
+
+ checkout-cache.c |   11 +++++++++--
+ 1 files changed, 9 insertions(+), 2 deletions(-)
+
+checkout-cache.c: e16619c9d099367c224fb485f5525d66267bbd92
+--- checkout-cache.c
++++ checkout-cache.c	2005-04-17 01:49:01.000000000 -0700
+@@ -121,8 +121,15 @@
+ {
+ 	int pos = cache_name_pos(name, strlen(name));
+ 	if (pos < 0) {
+-		if (!quiet)
+-			fprintf(stderr, "checkout-cache: %s is not in the cache\n", name);
++		if (!quiet) {
++			pos = -pos - 1;
++			fprintf(stderr,
++				"checkout-cache: %s is %s.\n",
++				name,
++				(pos < active_nr &&
++				 !strcmp(active_cache[pos]->name, name)) ?
++				"unmerged" : "not in the cache");
++		}
+ 		return -1;
+ 	}
+ 	return checkout_entry(active_cache[pos]);
+
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Junio C Hamano <junkio@cox.net>
+Subject: Summary of "read-tree -m O A B" mechanism
+Date: Sun, 17 Apr 2005 03:00:22 -0700
+Lines: 93
+Message-ID: <7v4qe5yb7t.fsf_-_@assigned-by-dhcp.cox.net>
+References: <Pine.LNX.4.58.0504140201130.7211@ppc970.osdl.org>
+	<7vll7lqlbg.fsf@assigned-by-dhcp.cox.net>
+	<20050414193507.GA22699@pasky.ji.cz>
+	<7vmzs1osv1.fsf@assigned-by-dhcp.cox.net>
+	<20050414233159.GX22699@pasky.ji.cz>
+	<7v7jj4q2j2.fsf@assigned-by-dhcp.cox.net>
+	<20050414223039.GB28082@64m.dyndns.org>
+	<7vfyxsmqmk.fsf@assigned-by-dhcp.cox.net>
+	<20050415062807.GA29841@64m.dyndns.org>
+	<7vfyxsi9bq.fsf@assigned-by-dhcp.cox.net>
+	<7vaco0i3t9.fsf_-_@assigned-by-dhcp.cox.net>
+	<Pine.LNX.4.58.0504151138490.7211@ppc970.osdl.org>
+	<7vmzrzhkd3.fsf@assigned-by-dhcp.cox.net>
+	<7vfyxrhfsw.fsf_-_@assigned-by-dhcp.cox.net>
+	<7vmzrzfwe4.fsf_-_@assigned-by-dhcp.cox.net>
+	<Pine.LNX.4.58.0504151755590.7211@ppc970.osdl.org>
+	<7v7jj3fjky.fsf@assigned-by-dhcp.cox.net>
+	<Pine.LNX.4.58.0504152152580.7211@ppc970.osdl.org>
+	<Pine.LNX.4.58.0504152256520.7211@ppc970.osdl.org>
+	<7vis2ncf8j.fsf@assigned-by-dhc
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Sun Apr 17 11:57:17 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DN6Wd-0006YY-8t
+	for gcvg-git@gmane.org; Sun, 17 Apr 2005 11:57:11 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S261295AbVDQKAk (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Sun, 17 Apr 2005 06:00:40 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S261294AbVDQKAk
+	(ORCPT <rfc822;git-outgoing>); Sun, 17 Apr 2005 06:00:40 -0400
+Received: from fed1rmmtao06.cox.net ([68.230.241.33]:21932 "EHLO
+	fed1rmmtao06.cox.net") by vger.kernel.org with ESMTP
+	id S261295AbVDQKAY (ORCPT <rfc822;git@vger.kernel.org>);
+	Sun, 17 Apr 2005 06:00:24 -0400
+Received: from assigned-by-dhcp.cox.net ([68.4.60.172])
+          by fed1rmmtao06.cox.net
+          (InterMail vM.6.01.04.00 201-2131-118-20041027) with ESMTP
+          id <20050417100023.DOWV1497.fed1rmmtao06.cox.net@assigned-by-dhcp.cox.net>;
+          Sun, 17 Apr 2005 06:00:23 -0400
+To: Linus Torvalds <torvalds@osdl.org>
+In-Reply-To: <7vll7i95u1.fsf_-_@assigned-by-dhcp.cox.net> (Junio C. Hamano's
+ message of "Sat, 16 Apr 2005 07:03:34 -0700")
+User-Agent: Gnus/5.1007 (Gnus v5.10.7) Emacs/21.4 (gnu/linux)
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+Earlier I wrote down a list of issues your recent "merge
+stage" changes have introduced to the rest of the plumbing, with
+a set of suggested adaptions.  I think all of them are cleared
+now (you have a pile of patches from me in your mailbox).
+
+I do not know what percentage of people on this list are using
+git without the Cogito part, but I suspect that the number might
+be quite small.  I also suspect, from the description Petr gave
+us on how the merging in Cogito works, Cogito does not currently
+use the "read-tree -m O A B" mechanism, and those majority who
+do not deal with the low level tools themselves would not have
+to know about the merge issues yet.  But I think it is a good
+time, now things have started to settle down, to summarize how
+various commands work when they see those "funny" dircache
+entries created after "read-tree -m O A B" has run.  Of course,
+people working on Cogito needs to know them, once they decide to
+use the "reed-tree -m O A B" mechanism.
+
+ * read-tree -m O A B
+
+   - For description on how this works, the definitive reading
+     is [*R1*].  In short:
+
+     - unlike ordinary read-tree, "-m" form reads up to three
+       trees and creates paths that are "unmerged".  
+
+     - trivial merges are done by read-tree itself.  only
+       conflicting paths will be in unmerged state when
+       read-tree returns.
+
+ * write-tree
+
+     - write-tree refuses to give you a tree until all the
+       unmerged paths are resolved.
+
+ * show-files
+
+   - "show-files --unmerged" and "show-files --stage" can be
+     used to examine detailed information on unmerged paths.
+     For an unmerged path, instead of recording a single
+     mode/SHA1 pair, the dircache records up to three such
+     pairs; one from tree O in stage 1, A in stage 2, and B in
+     stage 3.  This information can be used by the user (or
+     Cogito) to see what should eventually be recorded at the
+     path.
+
+ * update-cache
+
+   - An explicit "update-cache [--add] path" or "update-cache
+     [--add] --cacheinfo mode SHA1 path" tells the plumbing that
+     the user (or Cogito) wants to resolve it by storing
+     mode/SHA1 of the given working file or mode SHA1 specified
+     on the command line.  The path ceases to be in unmerged
+     state after this happens.
+
+     Similarly, "update-cache --remove path" resolves the
+     unmerged state and the merge result is not having anything
+     at that path.
+
+   - "update-cache --refresh", in addition to the "needs update"
+     message people are now familiar with, says "needs merge"
+     for unmerged paths.
+
+ * show-diff
+
+   - show-diff on an unmerged path simply says "unmerged" (the
+     plumbing would not know what to diff with what among three
+     stages and the working file).  
+
+ * checkout-cache
+
+   - "checkout-cache -a" warns about unmerged paths and checks
+     out only the merged paths.
+
+   - "checkout-cache [-f] path" on an unmerged path says
+     "Unmerged", just like the same command on non-existent path
+     says "not in the cache", and does not touch the working
+     file.
+ 
+
+I hope the descriptions in this summary is correct enough to be
+useful to somebody.
+
+
+[Reference]
+
+*R1* http://marc.theaimsgroup.com/?l=git&m=111363270608902&w=2
+
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Junio C Hamano <junkio@cox.net>
+Subject: [PATCH] Remove unused arguments from index_fd()
+Date: Sun, 17 Apr 2005 03:31:00 -0700
+Lines: 75
+Message-ID: <7vu0m5wv8b.fsf@assigned-by-dhcp.cox.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Sun Apr 17 12:28:03 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DN70L-0008L8-9K
+	for gcvg-git@gmane.org; Sun, 17 Apr 2005 12:27:53 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S261247AbVDQKba (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Sun, 17 Apr 2005 06:31:30 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S261299AbVDQKba
+	(ORCPT <rfc822;git-outgoing>); Sun, 17 Apr 2005 06:31:30 -0400
+Received: from fed1rmmtao10.cox.net ([68.230.241.29]:15356 "EHLO
+	fed1rmmtao10.cox.net") by vger.kernel.org with ESMTP
+	id S261247AbVDQKbF (ORCPT <rfc822;git@vger.kernel.org>);
+	Sun, 17 Apr 2005 06:31:05 -0400
+Received: from assigned-by-dhcp.cox.net ([68.4.60.172])
+          by fed1rmmtao10.cox.net
+          (InterMail vM.6.01.04.00 201-2131-118-20041027) with ESMTP
+          id <20050417103101.GVGE2123.fed1rmmtao10.cox.net@assigned-by-dhcp.cox.net>;
+          Sun, 17 Apr 2005 06:31:01 -0400
+To: Linus Torvalds <torvalds@osdl.org>
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+The function index_fd() in update-cache.c takes 5 arguments, but
+two is not necessary and one that is a pointer to a structure
+really needs to be a pointer to one member of that structure.
+This patch cleans it up.
+
+Also it removes printf() apparently left after initial
+debugging.
+
+Signed-off-by: Junio C Hamano <junkio@cox.net>
+---
+
+ update-cache.c |   15 ++++++---------
+ 1 files changed, 6 insertions(+), 9 deletions(-)
+
+update-cache.c: 5afecd1a4fd90d2505753ce2d5044d780fe69a7f
+--- update-cache.c
++++ update-cache.c	2005-04-17 03:22:39.000000000 -0700
+@@ -14,13 +14,13 @@
+  */
+ static int allow_add = 0, allow_remove = 0;
+ 
+-static int index_fd(const char *path, int namelen, struct cache_entry *ce, int fd, struct stat *st)
++static int index_fd(unsigned char *sha1, int fd, struct stat *st)
+ {
+ 	z_stream stream;
+ 	unsigned long size = st->st_size;
+-	int max_out_bytes = namelen + size + 200;
++	int max_out_bytes = size + 200;
+ 	void *out = malloc(max_out_bytes);
+-	void *metadata = malloc(namelen + 200);
++	void *metadata = malloc(200);
+ 	void *in;
+ 	SHA_CTX c;
+ 
+@@ -56,9 +56,9 @@
+ 	
+ 	SHA1_Init(&c);
+ 	SHA1_Update(&c, out, stream.total_out);
+-	SHA1_Final(ce->sha1, &c);
++	SHA1_Final(sha1, &c);
+ 
+-	return write_sha1_buffer(ce->sha1, out, stream.total_out);
++	return write_sha1_buffer(sha1, out, stream.total_out);
+ }
+ 
+ /*
+@@ -109,7 +109,7 @@
+ 	ce->ce_mode = create_ce_mode(st.st_mode);
+ 	ce->ce_flags = htons(namelen);
+ 
+-	if (index_fd(path, namelen, ce, fd, &st) < 0)
++	if (index_fd(ce->sha1, fd, &st) < 0)
+ 		return -1;
+ 
+ 	return add_cache_entry(ce, allow_add);
+@@ -244,13 +244,10 @@
+ 
+ 	if (sscanf(arg1, "%o", &mode) != 1)
+ 		return -1;
+-	printf("got mode %o\n", mode);
+ 	if (get_sha1_hex(arg2, sha1))
+ 		return -1;
+-	printf("got sha1 %s\n", sha1_to_hex(sha1));
+ 	if (!verify_path(arg3))
+ 		return -1;
+-	printf("got path %s\n", arg3);
+ 
+ 	len = strlen(arg3);
+ 	size = cache_entry_size(len);
+
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Junichi Uekawa <dancer@netfort.gr.jp>
+Subject: [PATCH] use gcrypt instead of libssl for hash
+Date: Sun, 17 Apr 2005 19:52:53 +0900
+Lines: 213
+Message-ID: <87hdi5oet6.dancerj@netfort.gr.jp>
+Mime-Version: 1.0 (generated by SEMI 1.14.6 - "Maruoka")
+Content-Type: multipart/signed;
+ boundary="pgp-sign-Multipart_Sun_Apr_17_19:52:49_2005-1"; micalg=pgp-sha1;
+ protocol="application/pgp-signature"
+Content-Transfer-Encoding: 7bit
+X-From: git-owner@vger.kernel.org Sun Apr 17 12:49:51 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DN7LS-0001B8-Rh
+	for gcvg-git@gmane.org; Sun, 17 Apr 2005 12:49:43 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S261299AbVDQKxT (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Sun, 17 Apr 2005 06:53:19 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S261300AbVDQKxT
+	(ORCPT <rfc822;git-outgoing>); Sun, 17 Apr 2005 06:53:19 -0400
+Received: from 68.105.138.210.bn.2iij.net ([210.138.105.68]:45841 "HELO
+	viper2.netfort.gr.jp") by vger.kernel.org with SMTP id S261299AbVDQKww
+	(ORCPT <rfc822;git@vger.kernel.org>);
+	Sun, 17 Apr 2005 06:52:52 -0400
+Received: (qmail 4303 invoked from network); 17 Apr 2005 10:52:51 -0000
+Received: from unknown (HELO atoron.dancer.pr.jp.netfort.gr.jp) (127.0.0.1)
+  by viper2.netfort.gr.jp with SMTP; 17 Apr 2005 10:52:51 -0000
+To: torvalds@osdl.org, git@vger.kernel.org
+User-Agent: Wanderlust/2.10.1 (Watching The Wheels) SEMI/1.14.6 (Maruoka) FLIM/1.14.6 (Marutamachi) APEL/10.6 Emacs/21.4 (i386-pc-linux-gnu) MULE/5.0 (SAKAKI)
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+--pgp-sign-Multipart_Sun_Apr_17_19:52:49_2005-1
+Content-Type: text/plain; charset=US-ASCII
+
+
+Hi,
+
+This is the first  time for me to send you a patch; be gentle.
+the following patch allows for use of gcrypt.
+
+libssl seems to have a restrictive licensing wrt GPL applications.
+
+This patch adds a requirement for libgcrypt11, and 
+removes the requirement for libssl.
+
+I hope I have not overlooked anything.
+
+
+Signed-off-by: Junichi Uekawa <dancer@debian.org>
+
+
+Makefile: 770595e02be4a9a55ff98910c53617c3b0f1e145
+--- Makefile
++++ Makefile	2005-04-17 19:38:00.000000000 +0900
+@@ -7,7 +7,7 @@
+ # BREAK YOUR LOCAL DIFFS! show-diff and anything using it will likely randomly
+ # break unless your underlying filesystem supports those sub-second times
+ # (my ext3 doesn't).
+-CFLAGS=-g -O3 -Wall
++CFLAGS=-g -O3 -Wall $(shell libgcrypt-config --cflags)
+ 
+ CC=gcc
+ 
+@@ -21,7 +21,7 @@
+ install: $(PROG)
+ 	install $(PROG) $(HOME)/bin/
+ 
+-LIBS= -lssl -lz
++LIBS= $(shell libgcrypt-config --libs) -lz
+ 
+ init-db: init-db.o
+ 
+cache.h: 5948db759b3f6fb5ade3b027f202330f71a8cb6a
+--- cache.h
++++ cache.h	2005-04-17 19:25:40.000000000 +0900
+@@ -12,7 +12,7 @@
+ #include <sys/mman.h>
+ #include <netinet/in.h>
+ 
+-#include <openssl/sha.h>
++#include <gcrypt.h>
+ #include <zlib.h>
+ 
+ /*
+read-cache.c: 740ffcce7026b268bd4dfe1d0a773ad7e3a24f96
+--- read-cache.c
++++ read-cache.c	2005-04-17 19:34:37.000000000 +0900
+@@ -116,11 +116,14 @@
+ int check_sha1_signature(unsigned char *sha1, void *map, unsigned long size)
+ {
+ 	unsigned char real_sha1[20];
+-	SHA_CTX c;
++	gcry_md_hd_t c;
+ 
+-	SHA1_Init(&c);
+-	SHA1_Update(&c, map, size);
+-	SHA1_Final(real_sha1, &c);
++	gcry_md_open(&c, GCRY_MD_SHA1, 0);
++	gcry_md_write(c, map, size);
++	gcry_md_final(c);
++	memcpy(real_sha1, gcry_md_read(c, 0), 20);
++	gcry_md_close(c);
++	
+ 	return memcmp(sha1, real_sha1, 20) ? -1 : 0;
+ }
+ 
+@@ -203,7 +206,7 @@
+ 	char *compressed;
+ 	z_stream stream;
+ 	unsigned char sha1[20];
+-	SHA_CTX c;
++	gcry_md_hd_t c;
+ 
+ 	/* Set it up */
+ 	memset(&stream, 0, sizeof(stream));
+@@ -222,9 +225,11 @@
+ 	size = stream.total_out;
+ 
+ 	/* Sha1.. */
+-	SHA1_Init(&c);
+-	SHA1_Update(&c, compressed, size);
+-	SHA1_Final(sha1, &c);
++	gcry_md_open(&c, GCRY_MD_SHA1, 0);
++	gcry_md_write(c, compressed, size);
++	gcry_md_final(c);
++	memcpy(sha1, gcry_md_read(c, 0), 20);
++	gcry_md_close(c);
+ 
+ 	if (write_sha1_buffer(sha1, compressed, size) < 0)
+ 		return -1;
+@@ -425,17 +430,20 @@
+ 
+ static int verify_hdr(struct cache_header *hdr, unsigned long size)
+ {
+-	SHA_CTX c;
++	gcry_md_hd_t c;
+ 	unsigned char sha1[20];
+ 
+ 	if (hdr->hdr_signature != htonl(CACHE_SIGNATURE))
+ 		return error("bad signature");
+ 	if (hdr->hdr_version != htonl(1))
+ 		return error("bad version");
+-	SHA1_Init(&c);
+-	SHA1_Update(&c, hdr, offsetof(struct cache_header, sha1));
+-	SHA1_Update(&c, hdr+1, size - sizeof(*hdr));
+-	SHA1_Final(sha1, &c);
++	gcry_md_open(&c, GCRY_MD_SHA1, 0);
++	gcry_md_write(c, hdr, offsetof(struct cache_header, sha1));
++	gcry_md_write(c, hdr+1, size - sizeof(*hdr));
++	gcry_md_final(c);
++	memcpy(sha1, gcry_md_read(c, 0), 20);
++	gcry_md_close(c);
++
+ 	if (memcmp(sha1, hdr->sha1, 20))
+ 		return error("bad header sha1");
+ 	return 0;
+@@ -498,7 +506,8 @@
+ 
+ int write_cache(int newfd, struct cache_entry **cache, int entries)
+ {
+-	SHA_CTX c;
++	gcry_md_hd_t c;
++
+ 	struct cache_header hdr;
+ 	int i;
+ 
+@@ -506,14 +515,16 @@
+ 	hdr.hdr_version = htonl(1);
+ 	hdr.hdr_entries = htonl(entries);
+ 
+-	SHA1_Init(&c);
+-	SHA1_Update(&c, &hdr, offsetof(struct cache_header, sha1));
++	gcry_md_open(&c, GCRY_MD_SHA1, 0);
++	gcry_md_write(c, &hdr, offsetof(struct cache_header, sha1));
+ 	for (i = 0; i < entries; i++) {
+ 		struct cache_entry *ce = cache[i];
+ 		int size = ce_size(ce);
+-		SHA1_Update(&c, ce, size);
++		gcry_md_write(c, ce, size);
+ 	}
+-	SHA1_Final(hdr.sha1, &c);
++	gcry_md_final(c);
++	memcpy(hdr.sha1, gcry_md_read(c, 0), 20);
++	gcry_md_close(c);
+ 
+ 	if (write(newfd, &hdr, sizeof(hdr)) != sizeof(hdr))
+ 		return -1;
+update-cache.c: 5afecd1a4fd90d2505753ce2d5044d780fe69a7f
+--- update-cache.c
++++ update-cache.c	2005-04-17 19:36:40.000000000 +0900
+@@ -22,7 +22,7 @@
+ 	void *out = malloc(max_out_bytes);
+ 	void *metadata = malloc(namelen + 200);
+ 	void *in;
+-	SHA_CTX c;
++	gcry_md_hd_t c;
+ 
+ 	in = "";
+ 	if (size)
+@@ -54,9 +54,11 @@
+ 
+ 	deflateEnd(&stream);
+ 	
+-	SHA1_Init(&c);
+-	SHA1_Update(&c, out, stream.total_out);
+-	SHA1_Final(ce->sha1, &c);
++	gcry_md_open(&c, GCRY_MD_SHA1, 0);
++	gcry_md_write(c, out, stream.total_out);
++	gcry_md_final(c);
++	memcpy(ce->sha1, gcry_md_read(c, 0), 20);
++	gcry_md_close(c);
+ 
+ 	return write_sha1_buffer(ce->sha1, out, stream.total_out);
+ }
+write-tree.c: 34a351b20fb38ea588f34bd9634f101b9dc533cb
+
+
+regards,
+	junichi
+
+
+-- 
+Junichi Uekawa, Debian Developer
+17D6 120E 4455 1832 9423  7447 3059 BF92 CD37 56F4
+http://www.netfort.gr.jp/~dancer/
+
+--pgp-sign-Multipart_Sun_Apr_17_19:52:49_2005-1
+Content-Type: application/pgp-signature
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.0 (GNU/Linux)
+
+iD8DBQBCYkADMFm/ks03VvQRAp4QAJ9MinAmSPc/m9H4KuQJzkoHZrAaywCfU8MD
++N5Rn72ynaxGGHH8ynz2G6I=
+=boGt
+-----END PGP SIGNATURE-----
+
+--pgp-sign-Multipart_Sun_Apr_17_19:52:49_2005-1--
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Brad Roberts <braddr@puremagic.com>
+Subject: [patch] fix for memory leak in write-tree.c
+Date: Sun, 17 Apr 2005 04:21:56 -0700 (PDT)
+Lines: 37
+Message-ID: <Pine.LNX.4.44.0504170418390.2625-100000@bellevue.puremagic.com>
+Mime-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-From: git-owner@vger.kernel.org Sun Apr 17 13:18:31 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DN7nF-0002ue-4c
+	for gcvg-git@gmane.org; Sun, 17 Apr 2005 13:18:25 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S261300AbVDQLWC (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Sun, 17 Apr 2005 07:22:02 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S261301AbVDQLWC
+	(ORCPT <rfc822;git-outgoing>); Sun, 17 Apr 2005 07:22:02 -0400
+Received: from bellevue.puremagic.com ([209.189.198.108]:11498 "EHLO
+	bellevue.puremagic.com") by vger.kernel.org with ESMTP
+	id S261300AbVDQLV7 (ORCPT <rfc822;git@vger.kernel.org>);
+	Sun, 17 Apr 2005 07:21:59 -0400
+Received: from bellevue.puremagic.com (localhost [127.0.0.1])
+	by bellevue.puremagic.com (8.13.3/8.13.3/Debian-6) with ESMTP id j3HBLu04002398
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NOT)
+	for <git@vger.kernel.org>; Sun, 17 Apr 2005 04:21:57 -0700
+Received: from localhost (braddr@localhost)
+	by bellevue.puremagic.com (8.13.3/8.13.3/Submit) with ESMTP id j3HBLuRe002394
+	for <git@vger.kernel.org>; Sun, 17 Apr 2005 04:21:56 -0700
+X-Authentication-Warning: bellevue.puremagic.com: braddr owned process doing -bs
+To: git@vger.kernel.org
+X-Virus-Scanned: by amavisd-new
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+I've made my tree rsync'able:
+
+rsync://gameboy2.puremagic.com/git
+
+
+commit 1cdbc0a19b8d9b68f1f42735e2f14f1289823a63
+tree 0e060fed0642337e675368913ec8d4f910a9f019
+parent 11ed64c1b141c9ba397a1ca76aef2cd250976007
+author Brad Roberts,,, <braddr@gameboy2> 1113736632 -0700
+committer Brad Roberts,,, <braddr@gameboy2> 1113736632 -0700
+
+Fix a memory leak in write-tree.c, not freeing the directory buffer.
+
+Index: write-tree.c
+===================================================================
+--- 51b1bddbbc05e50d5bbf1f9662e503c2e85d5e96/write-tree.c  (mode:100644 sha1:34a351b20fb38ea588f34bd9634f101b9dc533cb)
++++ 0e060fed0642337e675368913ec8d4f910a9f019/write-tree.c  (mode:100644 sha1:fb046aa6ce6b9fce6a523a1e36ff43adab9bdd93)
+@@ -93,10 +93,8 @@
+        i -= 5;
+        memcpy(buffer+i, "tree ", 5);
+
+-       buffer += i;
+-       offset -= i;
+-
+-       write_sha1_file(buffer, offset, returnsha1);
++       write_sha1_file(buffer + i, offset - i, returnsha1);
++       free(buffer);
+        return nr;
+ }
+
+
+
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+

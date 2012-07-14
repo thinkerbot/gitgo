@@ -1,0 +1,453 @@
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Jon Seymour <jon.seymour@gmail.com>
+Subject: Re: wit 0.0.3 - a web interface for git available
+Date: Fri, 22 Apr 2005 08:33:13 +1000
+Lines: 31
+Message-ID: <2cfc403205042115335b67f425@mail.gmail.com>
+References: <1113956951.3309.22.camel@localhost>
+	 <20050420041828.GA15391@kroah.com>
+	 <20050420094253.GB29910@infradead.org>
+	 <20050421012827.GA13795@vrfy.org>
+Reply-To: jon@zeta.org.au
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Cc: Christoph Hellwig <hch@infradead.org>, Greg KH <greg@kroah.com>,
+	Christian Meder <chris@absolutegiganten.org>,
+	git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Fri Apr 22 00:31:59 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DOkCg-0008Dr-AZ
+	for gcvg-git@gmane.org; Fri, 22 Apr 2005 00:31:22 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S261583AbVDUWfX (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Thu, 21 Apr 2005 18:35:23 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S261618AbVDUWdx
+	(ORCPT <rfc822;git-outgoing>); Thu, 21 Apr 2005 18:33:53 -0400
+Received: from rproxy.gmail.com ([64.233.170.203]:2251 "EHLO rproxy.gmail.com")
+	by vger.kernel.org with ESMTP id S261573AbVDUWdR convert rfc822-to-8bit
+	(ORCPT <rfc822;git@vger.kernel.org>);
+	Thu, 21 Apr 2005 18:33:17 -0400
+Received: by rproxy.gmail.com with SMTP id i8so518390rne
+        for <git@vger.kernel.org>; Thu, 21 Apr 2005 15:33:13 -0700 (PDT)
+DomainKey-Signature: a=rsa-sha1; q=dns; c=nofws;
+        s=beta; d=gmail.com;
+        h=received:message-id:date:from:reply-to:to:subject:cc:in-reply-to:mime-version:content-type:content-transfer-encoding:content-disposition:references;
+        b=rCU0GgDkRlY0dvX2Qhn++zsyFWHf6SNi+rAXW5q70DPqechcpwTuMf1BOkF0Fx9zwUGtBXAShgTknyyQoVxsjUaWbvFvgospU+iZAJ2nxZS2rxuPQ8l0FcRky3MIau4bvdT/Ame7luusqup8j1Q11LfjMzVWl6gzx7ucg5LWAI4=
+Received: by 10.38.11.1 with SMTP id 1mr2752609rnk;
+        Thu, 21 Apr 2005 15:33:13 -0700 (PDT)
+Received: by 10.38.104.32 with HTTP; Thu, 21 Apr 2005 15:33:13 -0700 (PDT)
+To: Kay Sievers <kay.sievers@vrfy.org>
+In-Reply-To: <20050421012827.GA13795@vrfy.org>
+Content-Disposition: inline
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+On 4/21/05, Kay Sievers <kay.sievers@vrfy.org> wrote:
+> On Wed, Apr 20, 2005 at 10:42:53AM +0100, Christoph Hellwig wrote:
+> 
+> It's working now:
+>   http://ehlo.org/~kay/gitweb.pl
+> 
+
+Kay + Christian + Ken,
+
+That looks really great!.
+
+One suggestion: when drilling down through the tree it would be nice
+if the context of the parents could be dragged along too. So, for
+example, when displaying the BLOB, you could display its name because
+you have kept enough context around to allow that.
+
+This would also allow you to extend the functionality so that when you
+are at the BLOB level you could navigate to a history of changes to
+just that BLOB, at least from the point of  view of the commit that
+got you there.
+
+Also, have you considered generating pure XML from the database and
+relying on XSLT (either at the server, or preferably at the client -
+they all do it well these days!) to do the HTML rendering?
+
+jon.
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Petr Baudis <pasky@ucw.cz>
+Subject: Re: Colorized git log
+Date: Fri, 22 Apr 2005 00:42:29 +0200
+Lines: 19
+Message-ID: <20050421224229.GR7443@pasky.ji.cz>
+References: <3536.10.10.10.24.1114117965.squirrel@linux1>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: GIT Mailing Lists <git@vger.kernel.org>
+X-From: git-owner@vger.kernel.org Fri Apr 22 00:38:29 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DOkJE-0000iO-5q
+	for gcvg-git@gmane.org; Fri, 22 Apr 2005 00:38:08 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S261479AbVDUWme (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Thu, 21 Apr 2005 18:42:34 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S261534AbVDUWme
+	(ORCPT <rfc822;git-outgoing>); Thu, 21 Apr 2005 18:42:34 -0400
+Received: from w241.dkm.cz ([62.24.88.241]:23690 "HELO machine.sinus.cz")
+	by vger.kernel.org with SMTP id S261479AbVDUWma (ORCPT
+	<rfc822;git@vger.kernel.org>); Thu, 21 Apr 2005 18:42:30 -0400
+Received: (qmail 18039 invoked by uid 2001); 21 Apr 2005 22:42:29 -0000
+To: Sean <seanlkml@sympatico.ca>
+Content-Disposition: inline
+In-Reply-To: <3536.10.10.10.24.1114117965.squirrel@linux1>
+User-Agent: Mutt/1.4i
+X-message-flag: Outlook : A program to spread viri, but it can do mail too.
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+Dear diary, on Thu, Apr 21, 2005 at 11:12:45PM CEST, I got a letter
+where Sean <seanlkml@sympatico.ca> told me that...
+> On the off chance that someone else might like it, here is a pager script
+> for the git log that adds a splash of color:
+
+Actually, I would've never expected that I would like it, but we all
+sometimes surprise ourselves.
+
+I made git log colorized if you pass it -c in current git-pasky. Thanks.
+
+-- 
+				Petr "Pasky" Baudis
+Stuff: http://pasky.or.cz/
+C++: an octopus made by nailing extra legs onto a dog. -- Steve Taylor
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Junio C Hamano <junio@siamese.dyndns.org>
+Subject: [PATCH] Make -p flag optional from commit-tree.
+Date: Thu, 21 Apr 2005 15:42:59 -0700
+Lines: 52
+Message-ID: <7v4qdzeop8.fsf@assigned-by-dhcp.cox.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Fri Apr 22 00:39:20 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DOkKB-0000q4-9k
+	for gcvg-git@gmane.org; Fri, 22 Apr 2005 00:39:07 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S261157AbVDUWnZ (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Thu, 21 Apr 2005 18:43:25 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S261200AbVDUWnZ
+	(ORCPT <rfc822;git-outgoing>); Thu, 21 Apr 2005 18:43:25 -0400
+Received: from fed1rmmtao12.cox.net ([68.230.241.27]:15319 "EHLO
+	fed1rmmtao12.cox.net") by vger.kernel.org with ESMTP
+	id S261157AbVDUWnD (ORCPT <rfc822;git@vger.kernel.org>);
+	Thu, 21 Apr 2005 18:43:03 -0400
+Received: from assigned-by-dhcp.cox.net ([68.4.60.172])
+          by fed1rmmtao12.cox.net
+          (InterMail vM.6.01.04.00 201-2131-118-20041027) with ESMTP
+          id <20050421224259.GDLH13819.fed1rmmtao12.cox.net@assigned-by-dhcp.cox.net>;
+          Thu, 21 Apr 2005 18:42:59 -0400
+To: Linus Torvalds <torvalds@osdl.org>
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+We cannot currently say:
+
+ $ commit-tree $(write-tree) $(cat .git/heads/junio .git/heads/linus)
+
+The above must be written as:
+
+ $ commit-tree $(write-tree) \
+     -p $(cat .git/heads/junio) \
+     -p $(cat .git/heads/linus)
+
+This patch makes -p flag optional.  Existing scripts are
+hopefully not affected because they are passing -p properly.  If
+we want to introduce non parent-ID parameters to commit-tree
+later, we can give them their own -flag letters.
+
+Signed-off-by: Junio C Hamano <junkio@cox.net>
+---
+
+ commit-tree.c |   15 +++++++++++----
+ 1 files changed, 11 insertions(+), 4 deletions(-)
+
+commit-tree.c: c0b07f89286c3f6cceae8122b4c3142c8efaf8e1
+--- a/commit-tree.c
++++ b/commit-tree.c
+@@ -297,10 +297,17 @@ int main(int argc, char **argv)
+ 		usage(commit_tree_usage);
+ 
+ 	check_valid(tree_sha1, "tree");
+-	for (i = 2; i < argc; i += 2) {
+-		char *a, *b;
+-		a = argv[i]; b = argv[i+1];
+-		if (!b || strcmp(a, "-p") || get_sha1_hex(b, parent_sha1[parents]))
++	for (i = 2; i < argc; i++) {
++		/* Historically commit-tree required -p in front of
++		 * each parent commit ID.  This is confusing.  We can
++		 * add non parent commit ID parameter later by defining
++		 * flags other than "-p" so let's just ignore them. 
++		 */
++		if (! strcmp(argv[i], "-p"))
++			continue;
++
++		/* Currently it just expects parent IDs. */
++		if (get_sha1_hex(argv[i], parent_sha1[parents]))
+ 			usage(commit_tree_usage);
+ 		check_valid(parent_sha1[parents], "commit");
+ 		parents++;
+
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Linus Torvalds <torvalds@osdl.org>
+Subject: Re: [PATCH] multi item packed files
+Date: Thu, 21 Apr 2005 15:47:10 -0700 (PDT)
+Lines: 69
+Message-ID: <Pine.LNX.4.58.0504211530370.2344@ppc970.osdl.org>
+References: <200504211113.13630.mason@suse.com> <Pine.LNX.4.58.0504210832490.2344@ppc970.osdl.org>
+ <m3u0m0q69a.fsf@defiant.localdomain> <200504211622.48065.mason@suse.com>
+Mime-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: Krzysztof Halasa <khc@pm.waw.pl>, git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Fri Apr 22 00:41:26 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DOkM6-00011R-Uk
+	for gcvg-git@gmane.org; Fri, 22 Apr 2005 00:41:07 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S261200AbVDUWpb (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Thu, 21 Apr 2005 18:45:31 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S261281AbVDUWpb
+	(ORCPT <rfc822;git-outgoing>); Thu, 21 Apr 2005 18:45:31 -0400
+Received: from fire.osdl.org ([65.172.181.4]:31105 "EHLO smtp.osdl.org")
+	by vger.kernel.org with ESMTP id S261200AbVDUWpU (ORCPT
+	<rfc822;git@vger.kernel.org>); Thu, 21 Apr 2005 18:45:20 -0400
+Received: from shell0.pdx.osdl.net (fw.osdl.org [65.172.181.6])
+	by smtp.osdl.org (8.12.8/8.12.8) with ESMTP id j3LMjDs4004078
+	(version=TLSv1/SSLv3 cipher=EDH-RSA-DES-CBC3-SHA bits=168 verify=NO);
+	Thu, 21 Apr 2005 15:45:14 -0700
+Received: from localhost (shell0.pdx.osdl.net [10.9.0.31])
+	by shell0.pdx.osdl.net (8.13.1/8.11.6) with ESMTP id j3LMjA1L029347;
+	Thu, 21 Apr 2005 15:45:12 -0700
+To: Chris Mason <mason@suse.com>
+In-Reply-To: <200504211622.48065.mason@suse.com>
+X-Spam-Status: No, hits=0 required=5 tests=
+X-Spam-Checker-Version: SpamAssassin 2.63-osdl_revision__1.35__
+X-MIMEDefang-Filter: osdl$Revision: 1.109 $
+X-Scanned-By: MIMEDefang 2.36
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+
+
+On Thu, 21 Apr 2005, Chris Mason wrote:
+> 
+> Shrug, we shouldn't need help from the kernel for something like this.  git as 
+> a database hits worst case scenarios for almost every FS.
+
+I really disagree. 
+
+> We've got:
+> 
+> 1) subdirectories with lots of files
+> 2) wasted space for tiny files
+> 3) files that are likely to be accessed together spread across the whole disk
+
+On the other hand, git does a lot of things that are just _lovely_ for a 
+filesystem:
+
+ - it never rewrites a file. Rewriting a file is unquestionably _the_ 
+   single worst access pattern for any filesystem. In contrast, never
+   writing to a file again means that filesystems can optimize their
+   layout and that things like defragmentation actually works.
+
+ - it caches beautifully, and efficiently. Part of it comes from never 
+   modifying files after they are written (which means that any network 
+   filesystem automatically breathes a huge sign of relief), but part of 
+   it is that it always reads full files, and the layout is done so that 
+   it really actually _uses_ everything it reads.
+
+   It also caches beautifully on a memory subsystem level, largely for the
+   same reasons.
+
+ - it doesn't use tons of directories.
+
+   You say that "subdirectories with lots of files" is painful, but that's 
+   not really the whole story. A _deep_ directory structure tends to 
+   actually be worse in many ways, because it's much easier to optimize a 
+   flat directory structure than a deep one. In other words, git ends up 
+   making name hashing etc _productive_. 
+
+So yes, it's a bit wasteful. But it's wasteful of what is absolutely the
+cheapest resource around: disk space. It's not a huge downside, and in
+fact I really do believe that the biggest downside _by_far_ in diskspace
+utilization is the _seek_ costs, not the space itself. Let's face it, 
+anybody who wants three years of kernel archives and thinks that 3GB of 
+disk is too much, has some serious problems.
+
+The _seek_ issue is real, but git actually has a very nice architecture
+even there: not only dos it cache really really well (and you can do a
+simple "ls-tree $(cat .git/HEAD)" and populate the case from the results),
+but the low level of indirection in a git archive means that it's almost
+totally prefetchable with near-perfect access patterns.
+
+In seeking, the real cost is synchronization, and the git model actually
+means that there are very few seeks that have to be synchronized. You
+could literally do the "ls-tree" thing and make an absolutely trivial
+prefetcher that did the prefetching with enough parallellism that the
+filesystem could probably get decent IO performance out of a disk.
+
+In other words, we really could have a "git prefetch" command that would 
+populate the cache of the current head quite efficiently. Because the data 
+layout supports that.
+
+		Linus
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Junio C Hamano <junio@siamese.dyndns.org>
+Subject: Re: [PATCH] Docs update
+Date: Thu, 21 Apr 2005 15:53:35 -0700
+Lines: 71
+Message-ID: <7vy8bbd9n4.fsf@assigned-by-dhcp.cox.net>
+References: <42680FCC.6030901@dgreaves.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: Petr Baudis <pasky@ucw.cz>, GIT Mailing Lists <git@vger.kernel.org>
+X-From: git-owner@vger.kernel.org Fri Apr 22 00:50:17 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DOkUG-0001wg-IH
+	for gcvg-git@gmane.org; Fri, 22 Apr 2005 00:49:32 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S261559AbVDUWxy (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Thu, 21 Apr 2005 18:53:54 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S261568AbVDUWxy
+	(ORCPT <rfc822;git-outgoing>); Thu, 21 Apr 2005 18:53:54 -0400
+Received: from fed1rmmtao04.cox.net ([68.230.241.35]:30909 "EHLO
+	fed1rmmtao04.cox.net") by vger.kernel.org with ESMTP
+	id S261559AbVDUWxl (ORCPT <rfc822;git@vger.kernel.org>);
+	Thu, 21 Apr 2005 18:53:41 -0400
+Received: from assigned-by-dhcp.cox.net ([68.4.60.172])
+          by fed1rmmtao04.cox.net
+          (InterMail vM.6.01.04.00 201-2131-118-20041027) with ESMTP
+          id <20050421225335.HZIB15592.fed1rmmtao04.cox.net@assigned-by-dhcp.cox.net>;
+          Thu, 21 Apr 2005 18:53:35 -0400
+To: David Greaves <david@dgreaves.com>
+In-Reply-To: <42680FCC.6030901@dgreaves.com> (David Greaves's message of
+ "Thu, 21 Apr 2005 21:40:44 +0100")
+User-Agent: Gnus/5.1007 (Gnus v5.10.7) Emacs/21.4 (gnu/linux)
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+>>>>> "DG" == David Greaves <david@dgreaves.com> writes:
+
+Looks nice.  I agree with Petr's comment that separating core part
+and Cogito part would be good, and I would appreciate if you
+pushed the core part documentation to Linus as well.
+
+Some nitpicks and notes on your core part description.
+
+DG>  commit-tree
+DG> -	commit-tree <sha1> [-p <sha1>]* < changelog
+DG> +	commit-tree <sha1> [-p <parent sha1>...] < changelog
+ 
+The above does not describe what commit-tree expects.  It wants
+
+    commit-tree <tree-sha1> [-p <parent1 sha1>]* <changelog
+
+That is, you need -p before every parent.  I however think what
+coommit-tree does here this aspect is wrong, unless Linus has
+plans to give parameters other than parent IDs to commit-tree
+later.  Even if that is the case, those non-parent things can
+have their own -flag in front of them so not requiring -p would
+be a good change.  I'll ask opinion from Linus on this (I just
+sent out a patch).
+
+DG> +A commit object usually has 1 parent (a commit after a change) or 2
+DG> +parents (a merge) although there is no reason it cannot have more than
+DG> +2 parents.
+
+I'd rewrite the "or 2 parents..." part to "up to 16 parents.  More
+than one parent represents merge of branches that led to them."
+
+DG> +If not provided, commit-tree uses your name, hostname and domain to
+DG> +provide author and committer info. This can be overridden using the
+DG> +following environment variables.
+DG> +	...
+DG> +(nb <,> and CRs are stripped)
+
+CRs are kept.  It removes '\n' (which is not necessarily LF).
+
+DG> +diff-cache
+DG> +	diff-cache [-r] [-z] <tree/commit sha1>
+DG> +
+DG> +Compares the content and mode of the blobs found via a tree object
+DG> +with the content of the current cache and, optionally, the stat state
+DG> +of the file on disk.
+
+And the option to use working tree is not having the --cached
+flag you describe later.  Please also update the usage at the
+top as well:
+
+	diff-cache [-r] [-z] [--cached] <tree/commit sha1>
+
+DG> +In the special case of the file being changed on disk and out of sync with the cache, the sha1
+DG> +
+DG> +Operating Modes
+
+Is the description truncated after "the sha1"???
+
+DG>  ################################################################
+DG>  diff-tree
+DG> -	diff-tree [-r] [-z] <tree sha1> <tree sha1>
+DG> +	diff-tree [-r] [-z] <tree sha1> <tree sha1> 
+
+This command can take commit ID in place of tree ID.
+ 
+
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+

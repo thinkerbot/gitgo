@@ -1,0 +1,340 @@
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Petr Baudis <pasky@ucw.cz>
+Subject: Re: [PATCH] Get commits from remote repositories by HTTP
+Date: Mon, 18 Apr 2005 20:47:50 +0200
+Lines: 29
+Message-ID: <20050418184750.GD5554@pasky.ji.cz>
+References: <Pine.LNX.4.21.0504161750020.30848-100000@iabervon.org> <12c511ca050416152452a4c620@mail.gmail.com> <200504181841.j3IIfgP31258@unix-os.sc.intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Cc: git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Mon Apr 18 20:44:50 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DNbDy-0003sF-9U
+	for gcvg-git@gmane.org; Mon, 18 Apr 2005 20:43:59 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S262141AbVDRSr5 (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Mon, 18 Apr 2005 14:47:57 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S262151AbVDRSr5
+	(ORCPT <rfc822;git-outgoing>); Mon, 18 Apr 2005 14:47:57 -0400
+Received: from w241.dkm.cz ([62.24.88.241]:58027 "HELO machine.sinus.cz")
+	by vger.kernel.org with SMTP id S262141AbVDRSrz (ORCPT
+	<rfc822;git@vger.kernel.org>); Mon, 18 Apr 2005 14:47:55 -0400
+Received: (qmail 11973 invoked by uid 2001); 18 Apr 2005 18:47:50 -0000
+To: tony.luck@intel.com
+Content-Disposition: inline
+In-Reply-To: <200504181841.j3IIfgP31258@unix-os.sc.intel.com>
+User-Agent: Mutt/1.4i
+X-message-flag: Outlook : A program to spread viri, but it can do mail too.
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+Dear diary, on Mon, Apr 18, 2005 at 08:41:42PM CEST, I got a letter
+where tony.luck@intel.com told me that...
+> >Not a patch ... it is a whole file.  I called it "git-wget", but it might
+> >also want to be called "git-pulltop".
+> 
+> It's been pointed out to me that I based this script on a pre-historic version
+> of ls-tree from sometime last week.  Modern versions print the mode with %06o
+> so there is a leading 0 on the mode for a directory.  Just change
+> 
+> 		if [ $mode = 40000 ]
+> 
+> to
+> 
+> 		if [ $mode = 040000 ]
+> 
+> to fix it.
+
+...and this is precisely why ls-tree actually outputs those "blob" and
+"tree" tags. ;-)
+
+-- 
+				Petr "Pasky" Baudis
+Stuff: http://pasky.or.cz/
+C++: an octopus made by nailing extra legs onto a dog. -- Steve Taylor
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Ray Lee <ray-lk@madrabbit.org>
+Subject: Re: [PATCH] Pretty-print date in 'git log'
+Date: Mon, 18 Apr 2005 12:02:02 -0700
+Organization: http://madrabbit.org/
+Lines: 20
+Message-ID: <1113850922.23938.54.camel@orca.madrabbit.org>
+References: <1113803220.11910.81.camel@localhost.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+Cc: git@vger.kernel.org, Petr Baudis <pasky@ucw.cz>
+X-From: git-owner@vger.kernel.org Mon Apr 18 21:01:28 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DNbUB-0006X2-JI
+	for gcvg-git@gmane.org; Mon, 18 Apr 2005 21:00:43 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S262164AbVDRTDq (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Mon, 18 Apr 2005 15:03:46 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S262170AbVDRTDU
+	(ORCPT <rfc822;git-outgoing>); Mon, 18 Apr 2005 15:03:20 -0400
+Received: from sb0-cf9a48a7.dsl.impulse.net ([207.154.72.167]:46052 "EHLO
+	madrabbit.org") by vger.kernel.org with ESMTP id S262164AbVDRTCD
+	(ORCPT <rfc822;git@vger.kernel.org>);
+	Mon, 18 Apr 2005 15:02:03 -0400
+Received: from orca.madrabbit.org (orca.madrabbit.org [192.168.1.51])
+	by madrabbit.org (Postfix) with ESMTP
+	id 7C0CB4C1442; Mon, 18 Apr 2005 12:02:02 -0700 (PDT)
+To: David Woodhouse <dwmw2@infradead.org>
+In-Reply-To: <1113803220.11910.81.camel@localhost.localdomain>
+X-Mailer: Evolution 2.2.1.1 
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+On Mon, 2005-04-18 at 15:46 +1000, David Woodhouse wrote:
+> Add tool to render git's "<utcseconds> <zone>" into an RFC2822-compliant
+> string, because I don't think date(1) can do it.
+
+I admit it's not obvious, but date(1) includes gnu's full date parser,
+so you can pull stunts like:
+
+ray:~/work/home$ date -ud 'jan 1, 1970 + 1111111111 seconds'
+Fri Mar 18 01:58:31 UTC 2005
+ray:~/work/home$ date -ud 'jan 1, 1970 + 1111111111 seconds + 0800'
+Fri Mar 18 09:58:31 UTC 2005
+
+Ray
+
+
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Paul Jackson <pj@sgi.com>
+Subject: Re: optimize gitdiff-do script
+Date: Mon, 18 Apr 2005 12:17:56 -0700
+Organization: SGI
+Lines: 28
+Message-ID: <20050418121756.2a4b6e2e.pj@sgi.com>
+References: <20050416232749.23430.93360.sendpatchset@sam.engr.sgi.com>
+	<20050416232810.23430.78712.sendpatchset@sam.engr.sgi.com>
+	<20050416234344.GQ19099@pasky.ji.cz>
+	<20050416171009.0bedbab4.pj@sgi.com>
+	<20050418082334.25359013.pj@sgi.com>
+	<20050418183038.GB5554@pasky.ji.cz>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Cc: git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Mon Apr 18 21:15:22 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DNbhw-0000HY-MT
+	for gcvg-git@gmane.org; Mon, 18 Apr 2005 21:14:56 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S262169AbVDRTS4 (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Mon, 18 Apr 2005 15:18:56 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S262170AbVDRTS4
+	(ORCPT <rfc822;git-outgoing>); Mon, 18 Apr 2005 15:18:56 -0400
+Received: from omx2-ext.sgi.com ([192.48.171.19]:32726 "EHLO omx2.sgi.com")
+	by vger.kernel.org with ESMTP id S262169AbVDRTSy (ORCPT
+	<rfc822;git@vger.kernel.org>); Mon, 18 Apr 2005 15:18:54 -0400
+Received: from cthulhu.engr.sgi.com (cthulhu.engr.sgi.com [192.26.80.2])
+	by omx2.sgi.com (8.12.11/8.12.9/linux-outbound_gateway-1.1) with ESMTP id j3IKwQCF015431;
+	Mon, 18 Apr 2005 13:58:36 -0700
+Received: from vpn2 (mtv-vpn-hw-pj-2.corp.sgi.com [134.15.25.219])
+	by cthulhu.engr.sgi.com (SGI-8.12.5/8.12.5) with SMTP id j3IJI0lU15758911;
+	Mon, 18 Apr 2005 12:18:03 -0700 (PDT)
+To: Petr Baudis <pasky@ucw.cz>
+In-Reply-To: <20050418183038.GB5554@pasky.ji.cz>
+X-Mailer: Sylpheed version 1.0.0 (GTK+ 1.2.10; i686-pc-linux-gnu)
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+Pasky wrote:
+> But what I said still holds - this can go
+> in only after we have a shell library sharing the common functions
+
+Ah - thanks for repeating that - it didn't sink in the first time.
+
+Good idea.
+
+> Yes, sorry about that; I had a lot of mail traffic lately ...
+
+No problem.  I hope you're having fun at the center of this cyclone.
+
+> I cannot guarantee I will look at it immediately, though.
+
+Good.  You priorities sound fine to me.
+
+I'll rework the patches and send them along again in a few days,
+when I get a chance.
+
+-- 
+                  I won't rest till it's the best ...
+                  Programmer, Linux Scalability
+                  Paul Jackson <pj@engr.sgi.com> 1.650.933.1373, 1.925.600.0401
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Linus Torvalds <torvalds@osdl.org>
+Subject: Re: [PATCH] fix bug in read-cache.c which loses files when merging
+ a tree
+Date: Mon, 18 Apr 2005 12:25:47 -0700 (PDT)
+Lines: 36
+Message-ID: <Pine.LNX.4.58.0504181219480.15725@ppc970.osdl.org>
+References: <1113848239.4998.45.camel@mulgrave>
+Mime-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Cc: git@vger.kernel.org
+X-From: git-owner@vger.kernel.org Mon Apr 18 21:21:52 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DNbmw-00016U-BZ
+	for gcvg-git@gmane.org; Mon, 18 Apr 2005 21:20:06 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S262170AbVDRTYE (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Mon, 18 Apr 2005 15:24:04 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S262171AbVDRTYE
+	(ORCPT <rfc822;git-outgoing>); Mon, 18 Apr 2005 15:24:04 -0400
+Received: from fire.osdl.org ([65.172.181.4]:26322 "EHLO smtp.osdl.org")
+	by vger.kernel.org with ESMTP id S262170AbVDRTYA (ORCPT
+	<rfc822;git@vger.kernel.org>); Mon, 18 Apr 2005 15:24:00 -0400
+Received: from shell0.pdx.osdl.net (fw.osdl.org [65.172.181.6])
+	by smtp.osdl.org (8.12.8/8.12.8) with ESMTP id j3IJNos4020508
+	(version=TLSv1/SSLv3 cipher=EDH-RSA-DES-CBC3-SHA bits=168 verify=NO);
+	Mon, 18 Apr 2005 12:23:51 -0700
+Received: from localhost (shell0.pdx.osdl.net [10.9.0.31])
+	by shell0.pdx.osdl.net (8.13.1/8.11.6) with ESMTP id j3IJNnBJ031055;
+	Mon, 18 Apr 2005 12:23:50 -0700
+To: James Bottomley <James.Bottomley@SteelEye.com>
+In-Reply-To: <1113848239.4998.45.camel@mulgrave>
+X-Spam-Status: No, hits=0 required=5 tests=
+X-Spam-Checker-Version: SpamAssassin 2.63-osdl_revision__1.35__
+X-MIMEDefang-Filter: osdl$Revision: 1.109 $
+X-Scanned-By: MIMEDefang 2.36
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+
+
+On Mon, 18 Apr 2005, James Bottomley wrote:
+>
+> I noticed this when I tried a non-trivial scsi merge and checked the
+> results against BK.  The problem is that remove_entry_at() actually
+> decrements active_nr, so decrementing it in add_cache_entry() before
+> calling remove_entry_at() is a double decrement (hence we lose cache
+> entries at the end).
+
+Thanks. Just before I was going to hit the same issue, too.
+
+I've pushed out my first real content merge: since Daniel Barkalow's
+object model stuff didn't apply to my tree any more (I had added the
+commit type tracking to mine after Daniel did his conversion), I
+instead applied his series to the place they were done against,
+and used git to merge the result with my current top-of-tree.
+
+I based it on the two example scripts I had sent out, but obviously never 
+tested until this point (since both of them had some serious syntax 
+errors, and thus clearly wouldn't work).
+
+I also checked in the stupid scripts, in the expectation that somebody
+else can improve on them and make them useful. For example, firing up an 
+editor when the merge fails is probably a damn good idea.
+
+Anyway, it seems to prove the concept of a real three-way merge, and it 
+all actually worked exactly the way I envisioned. Whether the end result 
+works or not, that's a different issue ;)
+
+			Linus
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+From news@gmane.org Tue Mar 04 03:33:20 2003
+From: Sanjoy Mahajan <sanjoy@mrao.cam.ac.uk>
+Subject: Re: [PATCH] Pretty-print date in 'git log'
+Date: Mon, 18 Apr 2005 20:57:11 +0100
+Lines: 19
+Message-ID: <E1DNcMp-0006sk-00@skye.ra.phy.cam.ac.uk>
+References: <1113850922.23938.54.camel@orca.madrabbit.org>
+Cc: David Woodhouse <dwmw2@infradead.org>, git@vger.kernel.org,
+	Petr Baudis <pasky@ucw.cz>
+X-From: git-owner@vger.kernel.org Mon Apr 18 21:54:22 2005
+Return-path: <git-owner@vger.kernel.org>
+Received: from vger.kernel.org ([12.107.209.244])
+	by ciao.gmane.org with esmtp (Exim 4.43)
+	id 1DNcJR-0005xO-UY
+	for gcvg-git@gmane.org; Mon, 18 Apr 2005 21:53:42 +0200
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+	id S262189AbVDRT5a (ORCPT <rfc822;gcvg-git@m.gmane.org>);
+	Mon, 18 Apr 2005 15:57:30 -0400
+Received: (majordomo@vger.kernel.org) by vger.kernel.org id S262190AbVDRT5a
+	(ORCPT <rfc822;git-outgoing>); Mon, 18 Apr 2005 15:57:30 -0400
+Received: from mraos.ra.phy.cam.ac.uk ([131.111.48.8]:32925 "EHLO
+	mraos.ra.phy.cam.ac.uk") by vger.kernel.org with ESMTP
+	id S262189AbVDRT5U (ORCPT <rfc822;git@vger.kernel.org>);
+	Mon, 18 Apr 2005 15:57:20 -0400
+Received: from skye.ra.phy.cam.ac.uk ([131.111.48.158] ident=mail)
+	by mraos.ra.phy.cam.ac.uk with esmtp (Exim 4.43)
+	id 1DNcMq-0006CQ-0p; Mon, 18 Apr 2005 20:57:12 +0100
+Received: from sanjoy by skye.ra.phy.cam.ac.uk with local (Exim 3.35 #1)
+	id 1DNcMp-0006sk-00; Mon, 18 Apr 2005 20:57:11 +0100
+To: Ray Lee <ray-lk@madrabbit.org>
+In-Reply-To: Your message of "Mon, 18 Apr 2005 12:02:02 PDT."
+             <1113850922.23938.54.camel@orca.madrabbit.org> 
+Sender: git-owner@vger.kernel.org
+Precedence: bulk
+X-Mailing-List: git@vger.kernel.org
+Status: RO
+
+> ray:~/work/home$ date -ud 'jan 1, 1970 + 1111111111 seconds'
+> Fri Mar 18 01:58:31 UTC 2005
+> ray:~/work/home$ date -ud 'jan 1, 1970 + 1111111111 seconds + 0800'
+> Fri Mar 18 09:58:31 UTC 2005
+
+I sent David a short script to do almost that, except that mine needed
+to negate the timezone whereas yours elegantly changes +0800 to + 0800
+
+In your 2nd example, you'll need 'sed' to replace UTC (or +0000 if
+using -R) in the output by +0800, because the 1111111111 is the UTC
+seconds, so the actual time is Fri Mar 18 01:58:31 UTC 2005 (as given
+by your first example).
+
+-Sanjoy
+-
+To unsubscribe from this list: send the line "unsubscribe git" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
