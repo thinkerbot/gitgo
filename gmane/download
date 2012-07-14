@@ -35,6 +35,11 @@ done
 shift $(($OPTIND - 1))
 
 group="${1}"
+if ! [ "$group" ]
+then
+  printf "no group specified\n"
+  exit 1
+fi
 shift 1
 
 ############################################################################
