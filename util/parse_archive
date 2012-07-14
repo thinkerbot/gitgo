@@ -1,31 +1,45 @@
 #!/bin/bash
-################################################################
-# Parses the gmane archive html into a textual topography
-#
-#   curl -s 'http://news.gmane.org/group/gmane.comp.version-control.git/last=0/force_load=very/?page=1856&action=--Action--' |
-#   ./util/parse_archive 
-#
-# Produces something like:
-#
-#   52
-#   |- 57
-#   | |- 61
-#   | `- 59
-#   |   |- 95
-#   |   | `- 1469
-#   |   |   |- 1501
-#   |   |   | |- 1571
-#   |   |   | | `- 1573
-#   |   |   | `- 1502
-#   |   |   `- 1471
-#   |   `- 110
-#   |     `- 114
-#   `- 118
-#     |- 185
-#     |- 127
-#     `- 119
-#
-################################################################
+############################################################################
+progname="${0##*/}"
+author="Simon Chiang"
+usage="usage: %s [-h] [FILE...]\n"
+opt="       %s   %s\n"
+
+while getopts "h" option
+do
+  case $option in
+    h  )  printf "$usage" "$progname"
+          printf '
+  Parses the gmane archive html into a textual topography.  Reads from
+  stdin if FILE is a single dash or no files are specified. Combine with
+  download for quick results.
+
+  ./archive.sh gmane.comp.version-control.git 0 1 2 | ./parse_archive
+
+  Produces something like:
+
+    1205 -- Colorized git log
+    `- 1208 -- Colorized git log
+     `- 1224 -- [PATCH] Colorized git log
+      `- 1225 -- [PATCH] Colorized git log
+       |- 1227 -- [PATCH] Colorized git log
+       `- 1226 -- [PATCH] Colorized git log
+
+'
+          printf "options:\n\n"
+          printf "$opt" "-h" "prints this help"
+          printf "\n"
+          exit 0 ;;
+    \? )  printf "$usage" "$progname"
+          exit 2 ;;
+  esac
+done
+shift $(($OPTIND - 1))
+
+############################################################################
+
+# read files
+cat $@ |
 
 # pull out topography and article numbers
 sed -e '
