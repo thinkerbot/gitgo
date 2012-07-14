@@ -53,8 +53,8 @@ href/g
 # rebuilt the topography as text
 sed -ne '
 /src/ {
-  s:src="/short/b+l.png".*: :
-  s:src="/short/I+l.png".*:| :
+  s:src="/short/b+l.png".*:   :
+  s:src="/short/I+l.png".*:|  :
   s:src="/short/T+l.png".*:|- :
   s:src="/short/L+l.png".*:`- :
   s:src="/short/k1+l.png".*::
