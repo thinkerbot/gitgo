@@ -12,7 +12,7 @@ do
           printf '
   Download pages from gmane.  Combine with parse to view pages as text.
 
-    ./archive.sh gmane.comp.version-control.git 0 1 2 | ./parse_archive
+    ./download gmane.comp.version-control.git 0 1 2 | ./parse
 
   Produces output like:
 

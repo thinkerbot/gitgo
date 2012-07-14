@@ -14,7 +14,7 @@ do
   stdin if FILE is a single dash or no files are specified. Combine with
   download for quick results.
 
-  ./archive.sh gmane.comp.version-control.git 0 1 2 | ./parse_archive
+    ./download gmane.comp.version-control.git 0 1 2 | ./parse
 
   Produces something like:
 
