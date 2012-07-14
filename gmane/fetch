@@ -2,7 +2,7 @@
 ############################################################################
 progname="${0##*/}"
 author="Simon Chiang"
-usage="usage: %s [-h] GROUP\n"
+usage="usage: %s [-h] GROUP [TARGET_DIR]\n"
 opt="       %s   %s\n"
 
 while getopts "h" option
@@ -18,7 +18,7 @@ do
     ./parse |
     sed -ne 's/[^0-9]*\([0-9]\{1,\}\).*/\1/p' |
     sort -n |
-    ./rangeify |
+    ./rangeify -e |
     ./fetch gmane.comp.version-control.git
 
 '
@@ -33,15 +33,27 @@ done
 shift $(($OPTIND - 1))
 
 group="${1}"
+target_dir="${2:-$(pwd)}"
 if ! [ "$group" ]
 then
   printf "no group specified\n"
   exit 1
 fi
-shift 1
+shift 2
 
 ############################################################################
 
+mkdir -p "$target_dir"
 while read start stop
-do curl -s "http://download.gmane.org/$group/$start/$stop"
+do 
+  mbox="$target_dir/${start}_${stop}.mbox"
+  curl -s "http://download.gmane.org/$group/$start/$stop" > "$mbox"
+  index=1
+  while [ $start -lt $stop ]
+  do
+    echo "save $index $target_dir/$start"
+    start=$((start + 1))
+    index=$((index + 1))
+  done | 
+  mail -Nf "$mbox"
 done
