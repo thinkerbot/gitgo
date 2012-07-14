@@ -1,0 +1,47 @@
+#!/bin/bash
+############################################################################
+progname="${0##*/}"
+author="Simon Chiang"
+usage="usage: %s [-h] GROUP\n"
+opt="       %s   %s\n"
+
+while getopts "h" option
+do
+  case $option in
+    h  )  printf "$usage" "$progname"
+          printf '
+  Fetch an mbox of messages from gmane.  Reads ranges from stdin which
+  should be in the format "START STOP" (STOP is not included). Use this
+  pipelind for quick results.
+
+    ./download gmane.comp.version-control.git 0 1 2 |
+    ./parse |
+    sed -ne 's/[^0-9]*\([0-9]\{1,\}\).*/\1/p' |
+    sort -n |
+    ./rangeify |
+    ./fetch gmane.comp.version-control.git
+
+'
+          printf "options:\n\n"
+          printf "$opt" "-h" "prints this help"
+          printf "\n"
+          exit 0 ;;
+    \? )  printf "$usage" "$progname"
+          exit 2 ;;
+  esac
+done
+shift $(($OPTIND - 1))
+
+group="${1}"
+if ! [ "$group" ]
+then
+  printf "no group specified\n"
+  exit 1
+fi
+shift 1
+
+############################################################################
+
+while read start stop
+do curl -s "http://download.gmane.org/$group/$start/$stop"
+done
