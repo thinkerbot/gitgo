@@ -2,12 +2,13 @@
 ############################################################################
 progname="${0##*/}"
 author="Simon Chiang"
-usage="usage: %s [-h] [FILE...]\n"
+usage="usage: %s [-a] [-h] [FILE...]\n"
 opt="       %s   %s\n"
 
-while getopts "h" option
+while getopts "ah" option
 do
   case $option in
+    a  )  arcs="true" ;;
     h  )  printf "$usage" "$progname"
           printf '
   Parses the gmane archive html into a textual topography.  Reads from
@@ -25,8 +26,17 @@ do
        |- 1227 -- [PATCH] Colorized git log
        `- 1226 -- [PATCH] Colorized git log
 
+  Printing arcs flattens this graph to parent/child relations:
+
+    1205 1208
+    1208 1224
+    1224 1225
+    1225 1227
+    1225 1226
+
 '
           printf "options:\n\n"
+          printf "$opt" "-a" "prints arc relations"
           printf "$opt" "-h" "prints this help"
           printf "\n"
           exit 0 ;;
@@ -75,5 +85,20 @@ sed -ne '
   # print it out!
   p
 }
+' |
+
+# flatten the graph to arcs
+if [ "$arcs" == "true" ]
+then ruby -ne '
+if $_ =~ /^(.*?)(\d+)/
+  stack = (stack || []).shift($1.length / 3)
+  stack << $2
+  if tail = stack[-2, 2]
+    puts tail.join(" ")
+  end
+end
 '
+else cat
+fi
+
 
