@@ -12,10 +12,14 @@ usage: fetch-messages [-h] GROUP [TARGET_DIR]
     ./fetch-messages gmane.comp.version-control.git
 
   Specify the directory to recieve the messages with TARGET_DIR, which is by
-  default working directory.
+  default working directory. Messages are named according to their index, and
+  the mbox for each range will be named like 'START_STOP.mbox'. By default
+  fetch-messages will resue an mbox file, if it exists.  Specify -f to force
+  a new download.
 
 options:
 
+        -f    force download of mbox files
         -h    prints this help
         -w    write rather than save (see 'man mail')
 
@@ -23,9 +27,11 @@ options:
 ############################################################################
 
 save="save"
+force="false"
 while getopts "hw" option
 do
   case $option in
+    f  )  force="true" ;;
     h  )  printf "$usage"
           exit 0 ;;
     w  )  save="write" ;;
@@ -50,9 +56,15 @@ mkdir -p "$target_dir"
 while read start stop
 do 
   mbox="$target_dir/${start}_${stop}.mbox"
-  curl -s "http://download.gmane.org/$group/$start/$((stop + 1))" > "$mbox"
+  if ! [ -e "$mbox" ] || [ "$force" = "true" ]
+  then curl -s "http://download.gmane.org/$group/$start/$((stop + 1))" > "$mbox"
+  fi
+
   for (( index=$start; index<=$stop; index++ ))
-  do echo "$(save) $((index - start + 1)) $target_dir/$index"
+  do
+    target="$target_dir/$index"
+    rm "$target" >/dev/null 2>&1
+    echo "$save $((index - start + 1)) $target"
   done | 
   mail -Nf "$mbox"
 done
