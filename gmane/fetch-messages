@@ -17,15 +17,18 @@ usage: fetch-messages [-h] GROUP [TARGET_DIR]
 options:
 
         -h    prints this help
+        -w    write rather than save (see 'man mail')
 
 "
 ############################################################################
 
-while getopts "h" option
+save="save"
+while getopts "hw" option
 do
   case $option in
     h  )  printf "$usage"
           exit 0 ;;
+    w  )  save="write" ;;
     \? )  printf "$usage" | head -n 1
           exit 2 ;;
   esac
@@ -49,7 +52,7 @@ do
   mbox="$target_dir/${start}_${stop}.mbox"
   curl -s "http://download.gmane.org/$group/$start/$((stop + 1))" > "$mbox"
   for (( index=$start; index<=$stop; index++ ))
-  do echo "save $((index - start + 1)) $target_dir/$index"
+  do echo "$(save) $((index - start + 1)) $target_dir/$index"
   done | 
   mail -Nf "$mbox"
 done
