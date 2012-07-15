@@ -1,0 +1,56 @@
+#!/bin/bash
+############################################################################
+usage="\
+usage: gitgo-write [-a ATTACHMENT] [-b BRANCH] [-h] [THREAD...]
+
+  Writes a message to the 'gitgo' branch to the specified threads. If the
+  branch does not exist, it will be created.
+
+  Attachments are saved in the tree and the message is read from stdin. The
+  parent commits are determined from the threads; all tail messages are made
+  parents by default. Specific shas can be used instead of thread ids. Starts
+  a new thread if no threads are specified.
+
+  Prints the sha of the resulting message.
+
+options:
+
+        -a    attachment files
+        -b    the storage branch (default 'gitgo')
+        -h    prints this help
+
+"
+############################################################################
+
+attachments=""
+branch="gitgo"
+while getopts "a:b:h" option
+do
+  case $option in
+    a  )  attachments="$OPTARG\n$attachments" ;;
+    b  )  branch="$OPTARG" ;;
+    h  )  printf "$usage"
+          exit 0 ;;
+    \? )  printf "$usage" | head -n 1
+          exit 2 ;;
+  esac
+done
+shift $(($OPTIND - 1))
+
+############################################################################
+
+# what happens if two files have the same basename?
+make_tree() {
+  while read file
+  do
+    name=`basename "$file"`
+    sha=`git hash-object -w "$file"`
+    printf "100644 blob %s\t%s\n" "$sha" "$name"
+  done | git mktree
+}
+
+############################################################################
+
+parents=`echo "$@" | sed -e 's/ \{1,\}/ -p /g'`
+tree=`printf "$attachments" | make_tree`
+git commit-tree "$tree" $parents
