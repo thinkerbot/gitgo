@@ -1,7 +1,7 @@
 #!/bin/bash
 ############################################################################
 usage="\
-usage: parse-news [-a] [-h] [FILE...]
+usage: parse-news [-ghlr] [FILE...]
 
   Parses the gmane archive html into a textual topography. Reads from stdin
   if FILE is a single dash or no files are specified. Combine with download
@@ -12,13 +12,14 @@ usage: parse-news [-a] [-h] [FILE...]
   Produces something like:
 
     1205 -- Colorized git log
-    `- 1208 -- Colorized git log
-     `- 1224 -- [PATCH] Colorized git log
-      `- 1225 -- [PATCH] Colorized git log
+    \`- 1208 -- Colorized git log
+     \`- 1224 -- [PATCH] Colorized git log
+      \`- 1225 -- [PATCH] Colorized git log
        |- 1227 -- [PATCH] Colorized git log
-       `- 1226 -- [PATCH] Colorized git log
+       \`- 1226 -- [PATCH] Colorized git log
 
-  Printing arcs flattens this graph to parent/child relations:
+  Other modes can list all the nodes (-l), list the nodes as ranges (-r) or
+  flatten the graph to parent/child relations (-g):
 
     1205 1208
     1208 1224
@@ -28,18 +29,23 @@ usage: parse-news [-a] [-h] [FILE...]
 
 options:
 
-        -a    prints arc relations
+        -g    print graph relations
         -h    prints this help
+        -l    list message ids
+        -r    list messages as ranges
 
 "
 ############################################################################
 
-while getopts "ah" option
+mode=""
+while getopts "ghlr" option
 do
   case $option in
-    a  )  arcs="true" ;;
+    g  )  mode="graph" ;;
     h  )  printf "$usage"
           exit 0 ;;
+    l  )  mode="list" ;;
+    r  )  mode="range" ;;
     \? )  printf "$usage" | head -n 1
           exit 2 ;;
   esac
@@ -86,7 +92,7 @@ sed -ne '
 ' |
 
 # flatten the graph to arcs
-if [ "$arcs" == "true" ]
+if [ "$mode" == "graph" ]
 then ruby -e '
 stack = []
 while line = gets
@@ -104,5 +110,35 @@ while line = gets
   end
 end
 '
+
+elif [ "$mode" == "list" ]
+then awk -F '--' '/./ {print $1}' | tr -cd "[0-9]\n"
+
+elif [ "$mode" == "range" ]
+then sed -ne 's/[^0-9]*\([0-9]\{1,\}\).*/\1/p' | sort -n | ruby -e '
+start, stop = nil, nil
+while line = gets
+  unless line =~ /^\d+$/
+    raise "not an integer: #{line}"
+  end
+
+  num = line.to_i
+
+  case
+  when stop.nil?
+    start, stop = num, num
+  when num == stop + 1
+    stop = num
+  else
+    puts "#{start} #{stop}"
+    start, stop = nil, nil
+  end
+end
+
+unless stop.nil?
+  puts "#{start} #{stop}"
+end
+'
+
 else cat
 fi
