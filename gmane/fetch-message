@@ -1,18 +1,11 @@
 #!/bin/bash
 ############################################################################
-progname="${0##*/}"
-author="Simon Chiang"
-usage="usage: %s [-h] GROUP [TARGET_DIR]\n"
-opt="       %s   %s\n"
+usage="\
+usage: parse-news [-a] [-h] [FILE...]
 
-while getopts "h" option
-do
-  case $option in
-    h  )  printf "$usage" "$progname"
-          printf '
-  Fetch an mbox of messages from gmane.  Reads ranges from stdin which
-  should be in the format "START STOP" (STOP is not included). Use this
-  pipelind for quick results.
+  Fetch an mbox of messages from gmane. Reads ranges from stdin which should
+  be in the format 'START STOP' (STOP is not included). Use this pipelind for
+  quick results.
 
     ./download gmane.comp.version-control.git 0 1 2 |
     ./parse |
@@ -21,12 +14,19 @@ do
     ./rangeify -e |
     ./fetch gmane.comp.version-control.git
 
-'
-          printf "options:\n\n"
-          printf "$opt" "-h" "prints this help"
-          printf "\n"
+options:
+
+        -h    prints this help
+
+"
+############################################################################
+
+while getopts "h" option
+do
+  case $option in
+    h  )  printf "$usage"
           exit 0 ;;
-    \? )  printf "$usage" "$progname"
+    \? )  printf "$usage" | head -n 1
           exit 2 ;;
   esac
 done

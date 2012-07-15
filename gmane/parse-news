@@ -1,21 +1,13 @@
 #!/bin/bash
 ############################################################################
-progname="${0##*/}"
-author="Simon Chiang"
-usage="usage: %s [-a] [-h] [FILE...]\n"
-opt="       %s   %s\n"
+usage="\
+usage: parse-news [-a] [-h] [FILE...]
 
-while getopts "ah" option
-do
-  case $option in
-    a  )  arcs="true" ;;
-    h  )  printf "$usage" "$progname"
-          printf '
-  Parses the gmane archive html into a textual topography.  Reads from
-  stdin if FILE is a single dash or no files are specified. Combine with
-  download for quick results.
+  Parses the gmane archive html into a textual topography. Reads from stdin
+  if FILE is a single dash or no files are specified. Combine with download
+  for quick results.
 
-    ./download gmane.comp.version-control.git 0 1 2 | ./parse
+    fetch-news gmane.comp.version-control.git 0 1 2 | parse-news
 
   Produces something like:
 
@@ -34,13 +26,21 @@ do
     1225 1227
     1225 1226
 
-'
-          printf "options:\n\n"
-          printf "$opt" "-a" "prints arc relations"
-          printf "$opt" "-h" "prints this help"
-          printf "\n"
+options:
+
+        -a    prints arc relations
+        -h    prints this help
+
+"
+############################################################################
+
+while getopts "ah" option
+do
+  case $option in
+    a  )  arcs="true" ;;
+    h  )  printf "$usage"
           exit 0 ;;
-    \? )  printf "$usage" "$progname"
+    \? )  printf "$usage" | head -n 1
           exit 2 ;;
   esac
 done

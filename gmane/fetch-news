@@ -1,0 +1,42 @@
+#!/bin/bash
+############################################################################
+usage="\
+usage: fetch-news [-h] GROUP [PAGE...]
+
+  Download news pages from gmane.
+
+example:
+
+  fetch-news gmane.comp.version-control.git 0 1 2
+
+options:
+
+        -h    prints this help
+
+"
+############################################################################
+
+while getopts "h" option
+do
+  case $option in
+    h  )  printf "$usage"
+          exit 0 ;;
+    \? )  printf "$usage" | head -n 1
+          exit 2 ;;
+  esac
+done
+shift $(($OPTIND - 1))
+
+group="${1}"
+if ! [ "$group" ]
+then
+  printf "no group specified\n"
+  exit 1
+fi
+shift 1
+
+############################################################################
+
+for page
+do curl -s "http://news.gmane.org/group/$group?page=${page}"
+done
