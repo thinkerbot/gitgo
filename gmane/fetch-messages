@@ -1,18 +1,18 @@
 #!/bin/bash
 ############################################################################
 usage="\
-usage: parse-news [-a] [-h] [FILE...]
+usage: fetch-messages [-h] GROUP [TARGET_DIR]
 
   Fetch an mbox of messages from gmane. Reads ranges from stdin which should
-  be in the format 'START STOP' (STOP is not included). Use this pipelind for
-  quick results.
+  be in the format 'START STOP' (STOP is included). Use this pipeline for
+  example:
 
-    ./download gmane.comp.version-control.git 0 1 2 |
-    ./parse |
-    sed -ne 's/[^0-9]*\([0-9]\{1,\}\).*/\1/p' |
-    sort -n |
-    ./rangeify -e |
-    ./fetch gmane.comp.version-control.git
+    ./fetch-news gmane.comp.version-control.git 0 1 2 |
+    ./parse-news -r |
+    ./fetch-messages gmane.comp.version-control.git
+
+  Specify the directory to recieve the messages with TARGET_DIR, which is by
+  default working directory.
 
 options:
 
@@ -47,13 +47,9 @@ mkdir -p "$target_dir"
 while read start stop
 do 
   mbox="$target_dir/${start}_${stop}.mbox"
-  curl -s "http://download.gmane.org/$group/$start/$stop" > "$mbox"
-  index=1
-  while [ $start -lt $stop ]
-  do
-    echo "save $index $target_dir/$start"
-    start=$((start + 1))
-    index=$((index + 1))
+  curl -s "http://download.gmane.org/$group/$start/$((stop + 1))" > "$mbox"
+  for (( index=$start; index<=$stop; index++ ))
+  do echo "save $((index - start + 1)) $target_dir/$index"
   done | 
   mail -Nf "$mbox"
 done
