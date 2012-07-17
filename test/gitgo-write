@@ -11,11 +11,18 @@ setup () {
   export GIT_AUTHOR_NAME="John Doe"
   export GIT_AUTHOR_EMAIL="john.doe@example.com"
   export GIT_AUTHOR_DATE="2010-09-08T07:06:05-04:00"
+  export GIT_COMMITTER_NAME="John Doe"
+  export GIT_COMMITTER_EMAIL="john.doe@example.com"
+  export GIT_COMMITTER_DATE="2010-09-08T07:06:05-04:00"
 }
 
 teardown () {
   cd "$user_dir"
 }
+
+#
+# basic
+#
 
 test_write_creates_commit_from_stdin  () {
   sha=`printf "Hello world." | gitgo-write`
@@ -26,11 +33,41 @@ commit $sha
 Author: John Doe <john.doe@example.com>
 Date:   Wed Sep 8 07:06:05 2010 -0400
 
-    Hello world.\
+    Hello world.
+
+    ---\
 " -
 
   git ls-tree $sha | assert_output "" -
 }
+
+test_write_appends_parents () {
+  a=`printf "Parent." | gitgo-write`
+  b=`printf "Child."  | gitgo-write $a`
+
+  git log $b | assert_output "\
+commit $b
+Author: John Doe <john.doe@example.com>
+Date:   Wed Sep 8 07:06:05 2010 -0400
+
+    Child.
+    
+    ---
+    + $a
+
+commit $a
+Author: John Doe <john.doe@example.com>
+Date:   Wed Sep 8 07:06:05 2010 -0400
+
+    Parent.
+    
+    ---\
+" -
+}
+
+#
+# attachments
+#
 
 test_write_stores_attachments_in_tree  () {
   printf "content\n" > file
@@ -52,4 +89,18 @@ test_write_accepts_filenames_with_spaces  () {
   git ls-tree $sha | assert_output "\
 100644 blob d95f3ad14dee633a758d2e331151e950dd13e4ed	filename with spaces\
 " -
+}
+
+#
+# storage
+#
+
+test_write_stores_commit_on_gitgo_branch () {
+  sha=`printf "Hello world." | gitgo-write`
+  git log --format="%H" gitgo | assert_output "$sha" -
+}
+
+test_write_stores_commit_on_b_branch () {
+  sha=`printf "Hello world." | gitgo-write -b gitgo-alt`
+  git log --format="%H" gitgo-alt | assert_output "$sha" -
 }

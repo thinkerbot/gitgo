@@ -51,6 +51,8 @@ make_tree() {
 
 ############################################################################
 
-parents=`echo "$@" | sed -e 's/ \{1,\}/ -p /g'`
+actions=`echo "$@" | tr ' ' "\n" | sed -ne '/./s/^/+ /p'`
+parent=`git log -n 1 --format='%H' "$branch" 2>/dev/null | sed -e 's/^/-p /'`
 tree=`printf "$attachments" | make_tree`
-git commit-tree "$tree" $parents
+sha=`cat - <(printf "\n\n---\n%s" "$actions") | git commit-tree "$tree" $parent`
+printf "%s\n" "$sha" | tee .git/refs/heads/"$branch"
