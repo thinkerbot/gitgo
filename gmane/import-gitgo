@@ -1,0 +1,38 @@
+#!/bin/bash
+
+archive_dir=${1:-archive}
+files_dir="$archive_dir/files"
+shas_dir="$archive_dir/shas"
+graph_file="$archive_dir/graph"
+
+mkdir -p "$shas_dir"
+
+import_to_gitgo () {
+  id="$1";
+  shift 1
+
+  sed -ne '
+  1,/^Status/d
+  p
+  ' "$files_dir/$id" |
+  ./bin/gitgo-write $@ > $shas_dir/$id
+}
+
+# order by tsort
+tsort "$graph_file" |
+nl |
+sort -nk 2 |
+join -1 2 -2 1 -a 1 -e null - <(sort -n "$graph_file") |
+sort -u |
+awk '{printf "%s\t%s\n", $2, $3}' |
+while read parent child
+do
+  parent_sha=`cat $shas_dir/$parent 2>/dev/null`
+  if ! [ "$parent_sha" ]
+  then parent_sha=`import_to_gitgo $parent`
+  fi
+
+  if [ "$child" ]
+  then import_to_gitgo $child $parent_sha
+  fi
+done
