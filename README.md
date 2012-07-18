@@ -37,32 +37,57 @@ Use a commit for each node, with a special format for the message.
     
     body...
     
-    tag tag tag     # store with command line escaping if spaces needed
-    actions         # one per-line as below
-
-Actions are:
-
-    + sha           # add as child (commit) to parent (sha)
-    ~ sha           # update vertex
-    - sha           # delete vertex
+    ---
+    : tag           # tags
+    + sha           # parent (sha) - child (commit)
+    ~ sha           # previous (sha) - current (commit)
+    - sha           # delete (sha)
 
 The commit tree points to message attachments.
+
+Non-node commits are indicated by lacking the tail section (for example
+merges). The tree for non-node commits can be anything as they are ignored.
+
+Distribution
+----------
+
+Standard branch distribution. Merges can be accomplished using any technique
+so long as the merge commit is not a node (see above). The plan is to
+implement a custom merge strategy that always results in an empty tree.
 
 Processing
 ----------
 
 Print the log and awk to list the graph data like:
 
-    0/A (A) # vertex
+    0/A (A) # node
     A/B (B) # edge, link
     A/B (A) # edge, update
-    A/A (A) # vertex, delete
+    A/A (A) # node, delete
 
-For each line if file A exists, append "A/B" and symlink B to A. Otherwise
-create A, write A, and then continue. For 0, append "A" (the all index).
-Remove all symlinks and the result will be sorted graphs named for each head.
-When displaying, these represent each thread or issue. The files can receive
-any new edges, but will need to be sorted afterwards.
+Then sort nodes into threads. For each line if collection A exists, append A/B
+and reference collection B to A. Otherwise create collection A, append A, and
+then continue. For 0, append "A" (the all index). The unique collections will
+be sorted graphs for each thread.
+
+Then deconvolute graphs so that updates and deletes are made current. Once
+deconvoluted the graph can be written as a commit tree and inspected with
+normal git tools. Update the deconvoluted graph as new data becomes available.
+
+Update:
+
+    A/B  (B)
+    B/B1 (B)
+
+Replace A/B with A/B1.  B will no longer be accessible.
+
+Delete:
+
+    A/A (A)
+
+Replace x/A with x/x. This rule includes the A/A line - A is now a separate
+node, still accessible if desired but identifiable as a detached head because
+it has no head file.
 
 Searches
 ---------
@@ -79,28 +104,3 @@ To search for:
 * Heads      - grep head files for sha
 
 Combine searches as needed to get the desired results.
-
-Display
----------
-
-The full graph can be deconvoluted so that updates and deletes are made
-current. Once deconvoluted the graph can e written as a commit tree and
-inspected with normal git tools. Expire the branch on updates to the issue. In
-the tree, track the issue content and attachments. Allow checkout of it in
-that way and thereby make the issue available in another way. Further work on
-the branch is meaningless, however.
-
-Update:
-
-    A/B  (B)
-    B/B1 (B)
-
-Replace A/B with A/B1 (sed).  B will no longer be accessible.
-
-Delete:
-
-    A/A (A)
-
-Replace x/A with x/x. This rule includes the A/A line - A is now a separate
-vertex, still accessible if desired but identifiable as a detached head
-because it has no head file.
