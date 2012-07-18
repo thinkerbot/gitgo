@@ -34,34 +34,81 @@ Author: John Doe <john.doe@example.com>
 Date:   Wed Sep 8 07:06:05 2010 -0400
 
     Hello world.
-
     ---\
 " -
 
   git ls-tree $sha | assert_output "" -
 }
 
-test_write_appends_parents () {
-  a=`printf "Parent." | gitgo-write`
-  b=`printf "Child."  | gitgo-write $a`
+#
+# tags
+#
 
-  git log $b | assert_output "\
+test_write_appends_tags_prefixed_by_colon () {
+  sha=`printf "Hello world." | gitgo-write -t a -t b -t c`
+  assert_status 0 $?
+
+  git log -n1 --format="%B" $sha | assert_output "\
+Hello world.
+---
+: a
+: b
+: c\
+" -
+}
+
+test_write_ignores_empty_tags () {
+  sha=`printf "Hello world." | gitgo-write -t "" -t "  "`
+  assert_status 0 $?
+
+  git log -n1 --format="%B" $sha | assert_output "\
+Hello world.
+---\
+" -
+}
+
+#
+# parents
+#
+
+test_write_appends_parents_prefixed_by_plus () {
+  a=`printf "Parent A" | gitgo-write`
+  b=`printf "Parent B" | gitgo-write`
+  c=`printf "Child"    | gitgo-write $a $b`
+
+  git log $c | assert_output "\
+commit $c
+Author: John Doe <john.doe@example.com>
+Date:   Wed Sep 8 07:06:05 2010 -0400
+
+    Child
+    ---
+    + $a
+    + $b
+
 commit $b
 Author: John Doe <john.doe@example.com>
 Date:   Wed Sep 8 07:06:05 2010 -0400
 
-    Child.
-    
+    Parent B
     ---
-    + $a
 
 commit $a
 Author: John Doe <john.doe@example.com>
 Date:   Wed Sep 8 07:06:05 2010 -0400
 
-    Parent.
-    
+    Parent A
     ---\
+" -
+}
+
+test_write_ignores_empty_parents () {
+  sha=`printf "Hello world." | gitgo-write "" "  "`
+  assert_status 0 $?
+
+  git log -n1 --format="%B" $sha | assert_output "\
+Hello world.
+---\
 " -
 }
 
@@ -89,6 +136,13 @@ test_write_accepts_filenames_with_spaces  () {
   git ls-tree $sha | assert_output "\
 100644 blob d95f3ad14dee633a758d2e331151e950dd13e4ed	filename with spaces\
 " -
+}
+
+test_write_ignores_empty_attachments () {
+  sha=`printf "Hello world." | gitgo-write -a "" -a "  "`
+  assert_status 0 $?
+
+  git ls-tree $sha | assert_output "" -
 }
 
 #

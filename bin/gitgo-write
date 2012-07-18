@@ -1,7 +1,7 @@
 #!/bin/bash
 ############################################################################
 usage="\
-usage: gitgo-write [-a ATTACHMENT] [-b BRANCH] [-h] [THREAD...]
+usage: gitgo-write [-a ATTACHMENT...] [-b BRANCH] [-h] [-t TAG...] [THREAD...]
 
   Writes a message to the 'gitgo' branch to the specified threads. If the
   branch does not exist, it will be created.
@@ -17,42 +17,82 @@ options:
 
         -a    attachment files
         -b    the storage branch (default 'gitgo')
+        -d    debug mode
         -h    prints this help
+        -t    specify tags
 
 "
 ############################################################################
 
 attachments=""
 branch="gitgo"
-while getopts "a:b:h" option
+tags=""
+mode="+"
+while getopts "a:b:dht:" option
 do
   case $option in
-    a  )  attachments="$OPTARG\n$attachments" ;;
+    a  )  attachments="${attachments}${OPTARG}\n" ;;
     b  )  branch="$OPTARG" ;;
+    d  )  debug="true" ;;
     h  )  printf "$usage"
           exit 0 ;;
+    t  )  tags="${tags}${OPTARG}\n" ;;
     \? )  printf "$usage" | head -n 1
           exit 2 ;;
   esac
 done
 shift $(($OPTIND - 1))
 
+if [ "$debug" == "true" ]
+then set -x
+fi
+
 ############################################################################
 
 # what happens if two files have the same basename?
-make_tree() {
+format_ls_tree() {
+  attachments="$1";
+
+  echo -e "$attachments" |
   while read file
   do
-    name=`basename "$file"`
-    sha=`git hash-object -w "$file"`
-    printf "100644 blob %s\t%s\n" "$sha" "$name"
-  done | git mktree
+    if [ "$file" ]
+    then
+      name=`basename "$file"`
+      sha=`git hash-object -w "$file"`
+      printf "100644 blob %s\t%s\n" "$sha" "$name"
+    fi
+  done
+}
+
+format_metadata () {
+  tags="$1"; mode="$2";
+  shift 2;
+
+  printf -- "\n---\n"
+
+  echo -e "$tags" |
+  while read tag
+  do
+    if [ "$tag" ]
+    then printf ": %s\n" "$tag"
+    fi
+  done
+
+  for parent in $@
+  do
+    if [ "$parent" ]
+    then
+      parent=`git rev-parse --verify -q "$parent"`
+      printf "%s %s\n" "$mode" "$parent"
+    fi
+  done
 }
 
 ############################################################################
 
-actions=`echo "$@" | tr ' ' "\n" | sed -ne '/./s/^/+ /p'`
-parent=`git log -n 1 --format='%H' "$branch" 2>/dev/null | sed -e 's/^/-p /'`
-tree=`printf "$attachments" | make_tree`
-sha=`cat - <(printf "\n\n---\n%s" "$actions") | git commit-tree "$tree" $parent`
+parent=`git rev-parse --verify -q "$branch"`
+tree=`format_ls_tree "$attachments" | git mktree`
+sha=`cat - <(format_metadata "$tags" "$mode" $@) | git commit-tree "$tree" ${parent:+-p} $parent`
+
 printf "%s\n" "$sha" | tee .git/refs/heads/"$branch"
