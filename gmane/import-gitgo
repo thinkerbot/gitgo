@@ -54,13 +54,13 @@ sort -nuk 3 |
 awk '{printf "%s\t%s\n", $1, $2}' |
 while read parent child
 do
-  if ! [ -e "$shas_dir/$parent" ]
+  if ! [ -e "$shas_dir/$parent" ] && [ -s "$files_dir/$parent" ]
   then 
     printf "import: %s\n" "$parent"
     `import_to_gitgo $parent`
   fi
 
-  if [ "$parent" != "$child" ] && ! [ -e "$shas_dir/$child" ]
+  if [ "$parent" != "$child" ] && ! [ -e "$shas_dir/$child" ] && [ -s "$files_dir/$child" ]
   then 
     printf "import: %s\n" "$child"
     parent_sha=`cat $shas_dir/$parent`
