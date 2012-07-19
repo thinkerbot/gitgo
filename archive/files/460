@@ -32,7 +32,7 @@ To: Linus Torvalds <torvalds@osdl.org>
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 The checkout-cache command says "file is not in the cache" when
 an unmerged path is given.  This patch adds code to distinguish

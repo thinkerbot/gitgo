@@ -39,7 +39,7 @@ User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.5) Gecko/20030927
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 On Mon, Apr 18, 2005 at 12:43:23AM -0700, Andy Isaacson wrote:
 > 

@@ -36,7 +36,7 @@ X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by pentafl
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 On Sun, 2005-04-17 at 19:25 -0400, jeff millar wrote:
 >     ln -sf /lib/modules/`uname -r`/build/include/linux /usr/local/include/linux

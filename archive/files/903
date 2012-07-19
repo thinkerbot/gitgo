@@ -36,7 +36,7 @@ Content-Disposition: inline
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 On Tuesday 19 April 2005 04:38 pm, Linus Torvalds wrote:
 > 

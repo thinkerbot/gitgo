@@ -34,7 +34,7 @@ X-Virus-Scanned: by amavisd-new
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 tree ebbf2c037e68116c4ff934f140ca12cdbe13311d
 parent 77de9e0b7a81ddc22526c9415f0273171f631d3f

@@ -42,7 +42,7 @@ X-Mailer: Ximian Evolution 1.4.6 (1.4.6-2)
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Wouldn't it be easier to force GMT or UTC as the base timezone for the
 application. This would remove any confusion between different

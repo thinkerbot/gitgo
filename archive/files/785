@@ -31,7 +31,7 @@ User-Agent: Mutt/1.3.28i
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 On Tue, Apr 19, 2005 at 05:51:07AM +0200, Petr Baudis wrote:
 > 	http://pasky.or.cz/~pasky/dev/git

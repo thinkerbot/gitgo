@@ -31,7 +31,7 @@ User-Agent: Mutt/1.5.8i
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 On Tue, Apr 19, 2005 at 03:00:04PM -0700, Linus Torvalds wrote:
 > 

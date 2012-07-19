@@ -37,7 +37,7 @@ X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by pentafl
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 On Thu, 2005-04-14 at 02:00 -0700, Linus Torvalds wrote:
 > I do like text output, but if it is painful, the "unix seconds" format is 

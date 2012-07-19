@@ -37,7 +37,7 @@ X-Mailer: Sylpheed version 1.0.0 (GTK+ 1.2.10; i686-pc-linux-gnu)
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Herbert wrote:
 > mktemp(1) creates the file before exiting.  ... O_EXCL

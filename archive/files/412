@@ -31,7 +31,7 @@ To: Linus Torvalds <torvalds@osdl.org>
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 The show-diff command uses a variable "new" but it is always
 used to point at the original data recorded in the dircache

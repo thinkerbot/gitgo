@@ -37,7 +37,7 @@ User-Agent: Gnus/5.1006 (Gnus v5.10.6) XEmacs/21.4 (Jumbo Shrimp, linux)
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 >>>>> "Brian" == Brian O'Mahoney <omb@khandalf.com> writes:
 

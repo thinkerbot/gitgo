@@ -28,7 +28,7 @@ To: Ingo Molnar <mingo@elte.hu>
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 I wrote a quick and dirty patch to check out blobs into .git/blobs, and
 hardlink them into the working directory; if you symlink .git/blobs

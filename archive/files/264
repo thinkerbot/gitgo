@@ -37,7 +37,7 @@ Content-Disposition: inline
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 This write will failing sooner or later when someone's disk fills up. 
 That'll leave someone with

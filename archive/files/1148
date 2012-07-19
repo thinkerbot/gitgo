@@ -39,7 +39,7 @@ X-IMAIL-SPAM-VALFROM: (da8a179500aaf4dc)
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Tom Lord graced us with:
 > I think you have made a mistake by moving the sha1 checksum from the

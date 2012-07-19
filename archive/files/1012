@@ -44,7 +44,7 @@ X-Enigmail-Supports: pgp-inline, pgp-mime
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 C. Scott Ananian wrote:
 > On Wed, 20 Apr 2005, David Greaves wrote:

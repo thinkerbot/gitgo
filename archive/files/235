@@ -36,7 +36,7 @@ In-Reply-To: <Pine.LNX.4.61.0504151437100.27637@cag.csail.mit.edu>; from cscott@
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 On Fri, Apr 15, 2005 at 02:45:55PM -0400, C. Scott Ananian wrote:
 > > - we already have wasted space due to the low-level filesystem (as

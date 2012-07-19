@@ -38,7 +38,7 @@ X-Sender: 258406@vger.kernel.org
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Stefan-W. Hahn wrote:
 > Hi,

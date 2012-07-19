@@ -31,7 +31,7 @@ To: Linus Torvalds <torvalds@osdl.org>
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 The function index_fd() in update-cache.c takes 5 arguments, but
 two is not necessary and one that is a pointer to a structure

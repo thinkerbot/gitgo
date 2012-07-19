@@ -39,7 +39,7 @@ X-IMAIL-SPAM-VALFROM: (8e4204c300b4b26c)
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Petr Baudis graced us with:
 > Dear diary, on Tue, Apr 19, 2005 at 02:36:32PM CEST, I got a letter

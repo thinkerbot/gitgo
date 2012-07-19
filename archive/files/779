@@ -35,7 +35,7 @@ X-Enigmail-Supports: pgp-inline, pgp-mime
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 I just stumbled across this page, dated 2003, which foreshadows a couple
 of the decisions Linus has made for git:

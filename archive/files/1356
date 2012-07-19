@@ -35,7 +35,7 @@ X-Domestic-Surveillance: money launder bomb tax evasion
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 On Fri, Apr 22, 2005 at 09:16:39AM -0700, Kyle Hayes wrote:
 > if(comma)

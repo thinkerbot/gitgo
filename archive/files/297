@@ -41,7 +41,7 @@ X-ELTE-SpamScore: -4
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 
 * David Lang <david.lang@digitalinsight.com> wrote:

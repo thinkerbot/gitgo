@@ -36,7 +36,7 @@ X-Spam-Checker-Version: SpamAssassin 3.0.2 (2004-11-16) on terminus.zytor.com
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Out of curiosity, I cooked up a version of git which used a flat base32, 
 instead of base64, repository.  The goal of this is, of course, to 

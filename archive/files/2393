@@ -26,7 +26,7 @@ In-reply-to: <Pine.LNX.4.58.0504201601130.6467@ppc970.osdl.org> (message from Li
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 
   The thing is, I don't "trickle" things in. That would be horribly 

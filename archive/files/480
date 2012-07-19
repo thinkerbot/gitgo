@@ -36,7 +36,7 @@ In-Reply-To: <Pine.LNX.4.58.0504161543590.7211@ppc970.osdl.org>; from torvalds@o
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 On Sat, Apr 16, 2005 at 04:01:45PM -0700, Linus Torvalds wrote:
 > So I re-created the dang thing (hey, it takes just a few minutes), and

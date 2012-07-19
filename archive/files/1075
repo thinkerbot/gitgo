@@ -33,7 +33,7 @@ User-Agent: Mutt/1.5.9i
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 On Wed, Apr 20, 2005 at 10:42:53AM +0100, Christoph Hellwig wrote:
 > On Tue, Apr 19, 2005 at 09:18:29PM -0700, Greg KH wrote:

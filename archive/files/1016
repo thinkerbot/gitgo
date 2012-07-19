@@ -35,7 +35,7 @@ User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.5) Gecko/20030927
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 On Tue, Apr 19, 2005 at 06:48:57PM -0400, C. Scott Ananian wrote:
 > On Tue, 19 Apr 2005, David Meybohm wrote:

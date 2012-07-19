@@ -30,7 +30,7 @@ In-Reply-To: <Pine.LNX.4.21.0504171108060.30848-100000@iabervon.org>
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 This adds support to revision.h for parsing commit records (but not going
 any further than parsing a single record). Something like this is needed

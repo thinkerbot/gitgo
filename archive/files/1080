@@ -31,7 +31,7 @@ To: Linus Torvalds <torvalds@osdl.org>
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Usage string fixes to make maintenance easier (only one instance
 of a string to update not multiple copies).  I've spotted and

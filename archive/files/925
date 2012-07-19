@@ -28,7 +28,7 @@ To: git@vger.kernel.org
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Just in case someone else is considering trying it, I've just written a
 pair of programs to transfer a commit and everything it uses directly over

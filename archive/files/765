@@ -30,7 +30,7 @@ In-Reply-To: <Pine.LNX.4.21.0504182139250.30848-100000@iabervon.org>
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 This changes merge-base to use the dates of commit to search the
 history. It will find the most recent common ancestor, rather than the one

@@ -37,7 +37,7 @@ In-Reply-To: <E1DNlmx-00029W-L2@flint.arm.linux.org.uk>; from src@flint.arm.linu
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 My automatic pull this morning produced the following messages, which
 seem to indicate that something's up with git pull now.

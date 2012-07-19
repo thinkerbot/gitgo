@@ -41,7 +41,7 @@ X-ELTE-SpamScore: -4
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 
 make actual use of the parse_commit() return value and print a warning, 

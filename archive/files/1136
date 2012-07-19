@@ -31,7 +31,7 @@ User-Agent: KMail/1.8
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 --Boundary-00=_JM8ZCEgis9HJICk
 Content-Type: text/plain;

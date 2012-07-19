@@ -32,7 +32,7 @@ User-Agent: Mutt/1.5.6+20040907i
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 On Sat, Apr 16, 2005 at 10:58:15AM -0400, C. Scott Ananian wrote:
 > Even given the known weaknesses in MD5, it would take much more than a 

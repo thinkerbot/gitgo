@@ -44,7 +44,7 @@ To: git@vger.kernel.org
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 I downloaded git-pasky 0.6.2.  I cannot compile it because my zlib 
 version is 1.1.4 and git-pasky relies on function deflateBound() which 

@@ -39,7 +39,7 @@ User-Agent: Mutt/1.5.6i
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 With git-pasky 0.6.3, "git log" is unusable on my Mandrake 10.1 system.
 Basically I get a neverending flood of these until I press 'q' to quit

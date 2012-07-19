@@ -38,7 +38,7 @@ X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by pentafl
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 On Mon, 2005-04-18 at 12:27 +0200, Petr Baudis wrote:
 > Yes. As far as I'm concerned, I'd put such stuff to git log, and extend

@@ -37,7 +37,7 @@ X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by pentafl
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 On Sat, 2005-04-16 at 10:04 -0700, Linus Torvalds wrote:
 > So I'd _almost_ suggest just starting from a clean slate after all.  

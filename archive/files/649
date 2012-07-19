@@ -31,7 +31,7 @@ To: git <git@vger.kernel.org>
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 How will git handle a corrupted (git) file system?
 

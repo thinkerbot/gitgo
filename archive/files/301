@@ -49,7 +49,7 @@ X-Virus-Status: Clean
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Three points:
 (1) I _have_ seen real-life collisions with MD5, in the context of

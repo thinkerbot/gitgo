@@ -39,7 +39,7 @@ X-PMX-Version: 4.7.0.111621
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 David Greaves wrote:
 > Petr Baudis wrote:

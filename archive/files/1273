@@ -38,7 +38,7 @@ X-Enigmail-Supports: pgp-inline, pgp-mime
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Chris Wright wrote:
 > Here's a simple spec file to do rpm builds.

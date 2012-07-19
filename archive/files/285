@@ -30,7 +30,7 @@ X-OriginalArrivalTime: 16 Apr 2005 05:01:26.0562 (UTC) FILETIME=[57F09820:01C542
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Doesn't seem to make sense to use MADV_RANDOM on the cache file, but 
 maybe MADV_SEQUENTIAL on the rest...

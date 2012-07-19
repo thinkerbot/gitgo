@@ -31,7 +31,7 @@ To: Linus Torvalds <torvalds@osdl.org>
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Patch 1/6 in the series has already cleaned the interface to
 call sq_expand(), but the comment before that function still

@@ -35,7 +35,7 @@ X-Virus-Scanned: Symantec AntiVirus Scan Engine
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Ingo Molnar wrote:
 > * Ingo Molnar <mingo@elte.hu> wrote:

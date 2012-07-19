@@ -30,7 +30,7 @@ In-Reply-To: <Pine.LNX.4.21.0504182139250.30848-100000@iabervon.org>
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Functions for a date-ordered queue of commits, progressively pulled out of
 the history incrementally. Linus wanted this for finding the most recent

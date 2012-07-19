@@ -31,7 +31,7 @@ X-message-flag: Outlook : A program to spread viri, but it can do mail too.
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Dear diary, on Fri, Apr 15, 2005 at 08:44:02PM CEST, I got a letter
 where Linus Torvalds <torvalds@osdl.org> told me that...

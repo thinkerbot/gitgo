@@ -30,7 +30,7 @@ X-OriginalArrivalTime: 17 Apr 2005 03:08:21.0500 (UTC) FILETIME=[B6240BC0:01C542
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 commit b0550573055abcf8ad19dcb8a036c32dd00a3be4
 tree b77882b170769c07732381b9f19ff2dd5c9f1520

@@ -35,7 +35,7 @@ X-Mailer: Evolution 2.2.2 (2.2.2-1)
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 On Tue, 2005-04-19 at 02:52 +0200, Petr Baudis wrote:
 > Dear diary, on Tue, Apr 19, 2005 at 02:44:15AM CEST, I got a letter

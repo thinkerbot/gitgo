@@ -30,7 +30,7 @@ In-Reply-To: <Pine.LNX.4.21.0504171108060.30848-100000@iabervon.org>
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 merge-base finds one of the best common ancestors of a pair of commits. In
 particular, it finds one of the ones which is fewest commits away from the

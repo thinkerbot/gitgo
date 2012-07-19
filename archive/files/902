@@ -54,7 +54,7 @@ X-Virus-Scanned: by amavisd-new using ClamAV at nosferatu.za.org
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 
 --=-T10SikV9iHyofFtu70la

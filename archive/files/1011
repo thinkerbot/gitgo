@@ -35,7 +35,7 @@ In-Reply-To: <Pine.LNX.4.61.0504200917070.28851@cag.csail.mit.edu>
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Here's a quick rev of the chunking code.  This is compatible with 
 git-current, where the hashes are of the *uncompressed* file.

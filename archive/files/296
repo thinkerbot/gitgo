@@ -35,7 +35,7 @@ In-Reply-To: <1113593583.29624.46.camel@maze.mythral.org>
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 we alrady have the concept of objects that contain objects and therefor 
 don'e need to be re-checked (directories), the chunks inside a file could 

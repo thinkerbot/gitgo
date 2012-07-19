@@ -54,7 +54,7 @@ User-Agent: Gnus/5.1007 (Gnus v5.10.7) Emacs/21.4 (gnu/linux)
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 The ce_namelen field has been renamed to ce_flags and split into
 the top 2-bit unused, next 2-bit stage number and the lowest

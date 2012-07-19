@@ -34,7 +34,7 @@ User-Agent: Mutt/1.5.8i
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Alright, let's try some small i2c and w1 patches...
 

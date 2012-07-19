@@ -30,7 +30,7 @@ In-Reply-To: <20050417144947.GG1487@pasky.ji.cz>
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Here are a bunch of patches which I made first against linus, that I've
 rebased against pasky because they're mostly more version-control-like.

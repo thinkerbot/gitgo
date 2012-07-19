@@ -46,7 +46,7 @@ X-PGP-Fingerprint-OpenGPG: 1024D/A11CA902 9B75 F658 368C 366C 7BB3  5AB1 2479 97
 Sender: git-owner@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: git@vger.kernel.org
-Status: R
+Status: RO
 
 Hi all!
 
