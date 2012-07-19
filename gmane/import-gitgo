@@ -5,34 +5,65 @@ files_dir="$archive_dir/files"
 shas_dir="$archive_dir/shas"
 graph_file="$archive_dir/graph"
 
+rm -r "$shas_dir"
 mkdir -p "$shas_dir"
 
-import_to_gitgo () {
-  id="$1";
-  shift 1
 
-  sed -ne '
-  1,/^Status/d
-  p
-  ' "$files_dir/$id" |
-  ./bin/gitgo-write $@ > $shas_dir/$id
+# import: 356
+# fatal: empty ident  <> not allowed
+# import: 363
+# warning: ignoring broken ref refs/heads/gitgo.
+# fatal: empty ident  <> not allowed
+# import: 342
+# warning: ignoring broken ref refs/heads/gitgo.
+# import: 340
+# import: 335
+
+import_to_gitgo () {
+id="$1";
+shift 1
+
+author_email="$(
+grep -m 1 -E '^From:' "$files_dir/$id" | sed -e '
+s/From: //
+s/>//
+' | tr -d '"'
+)"
+date=`grep -m 1 -E '^Date:' "$files_dir/$id" | sed -e 's/Date: //'`
+
+export GIT_AUTHOR_NAME=`echo $author_email | cut -d '<' -f 1`
+export GIT_AUTHOR_EMAIL=`echo $author_email | cut -d '<' -f 2`
+export GIT_AUTHOR_DATE="$date"
+
+sed -ne '
+1,/^Status/ {
+  /^Subject:/s/Subject: //p
+  d
+}
+p
+' "$files_dir/$id" |
+./bin/gitgo-write $@ > $shas_dir/$id
 }
 
 # order by tsort
 tsort "$graph_file" |
 nl |
 sort -nk 2 |
-join -1 2 -2 1 -a 1 -e null - <(sort -n "$graph_file") |
-sort -u |
-awk '{printf "%s\t%s\n", $2, $3}' |
+join -2 2 -a 1 <(sort -n archive/graph) - |
+sort -nuk 3 |
+awk '{printf "%s\t%s\n", $1, $2}' |
 while read parent child
 do
-  parent_sha=`cat $shas_dir/$parent 2>/dev/null`
-  if ! [ "$parent_sha" ]
-  then parent_sha=`import_to_gitgo $parent`
+  if ! [ -e "$shas_dir/$parent" ]
+  then 
+    printf "import: %s\n" "$parent"
+    `import_to_gitgo $parent`
   fi
 
-  if [ "$child" ]
-  then import_to_gitgo $child $parent_sha
+  if [ "$parent" != "$child" ] && ! [ -e "$shas_dir/$child" ]
+  then 
+    printf "import: %s\n" "$child"
+    parent_sha=`cat $shas_dir/$parent`
+    import_to_gitgo $child $parent_sha
   fi
 done
