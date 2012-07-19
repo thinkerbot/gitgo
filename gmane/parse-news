@@ -116,29 +116,25 @@ then awk -F '--' '/./ {print $1}' | tr -cd "[0-9]\n"
 
 elif [ "$mode" == "range" ]
 then sed -ne 's/[^0-9]*\([0-9]\{1,\}\).*/\1/p' | sort -n | ruby -e '
-start, stop = nil, nil
+previous = nil
 while line = gets
   unless line =~ /^\d+$/
     raise "not an integer: #{line}"
   end
 
-  num = line.to_i
+  current = line.to_i
 
-  case
-  when stop.nil?
-    start, stop = num, num
-  when num == stop + 1
-    stop = num
-  else
-    puts "#{start} #{stop}"
-    start, stop = nil, nil
+  unless current - 1 == previous
+    print "#{previous}\n" if previous
+    print "#{current} "
   end
+
+  previous = current
 end
 
-unless stop.nil?
-  puts "#{start} #{stop}"
+if previous
+  print "#{previous}\n" 
 end
 '
-
 else cat
 fi
