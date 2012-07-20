@@ -1,0 +1,56 @@
+#!/bin/bash
+############################################################################
+usage="\
+usage: gitgo-parse [SINCE...UNTIL]
+
+  Parses the specified gitgo messages into node pairs a-la tsort.
+
+options:
+
+        -d    debug mode
+        -h    prints this help
+
+"
+############################################################################
+
+while getopts "dh" option
+do
+  case $option in
+    d  )  debug="true" ;;
+    h  )  printf "$usage"
+          exit 0 ;;
+    \? )  printf "$usage" | head -n 1
+          exit 2 ;;
+  esac
+done
+shift $(($OPTIND - 1))
+
+if [ "$debug" == "true" ]
+then set -x
+fi
+
+############################################################################
+
+git log --format=raw $@ |
+awk '
+/^commit / {
+  print $2
+  n=0
+  next
+}
+/^    ---/ {
+  n=1
+  next
+}
+/^    [+-~:] / {
+  if ( n > 0) children[n++] = $0
+  next
+}
+/^$/ { 
+  for (i=1; i<n; i++) {
+    print children[i]
+  }
+  next
+}
+{ n=0 }
+'
