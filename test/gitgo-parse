@@ -65,3 +65,21 @@ $a : one
 $a . $a
 " -
 }
+
+test_raw_data_skips_commits_without_metadata () {
+a=`printf "A" | gitgo-write`
+
+tree=`git mktree <&-`
+sha=`printf "message" | git commit-tree $tree -p $a`
+printf "%s\n" "$sha"  > $test_dir/.git/refs/heads/gitgo
+
+b=`printf "B" | gitgo-write $a`
+
+raw_data $b | assert_output "\
+$b + $a
+$b . $b
+$a . $a
+" -
+
+git log --oneline gitgo | wc -l | tr -d " \n" | assert_output "3" -
+}
