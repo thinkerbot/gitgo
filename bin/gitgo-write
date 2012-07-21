@@ -53,7 +53,7 @@ fi
 format_ls_tree() {
   attachments="$1";
 
-  echo -e "$attachments" |
+  printf "%b" "$attachments" |
   while read file
   do
     if [ "$file" ]
@@ -71,7 +71,7 @@ format_metadata () {
 
   printf -- "\n---\n"
 
-  echo -e "$tags" |
+  printf "%b" "$tags" |
   while read tag
   do
     if [ "$tag" ]

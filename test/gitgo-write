@@ -34,7 +34,7 @@ Author: John Doe <john.doe@example.com>
 Date:   Wed Sep 8 07:06:05 2010 -0400
 
     Hello world.
-    ---\
+    ---
 " -
 
   git ls-tree $sha | assert_output "" -
@@ -48,12 +48,16 @@ test_write_appends_tags_prefixed_by_colon () {
   sha=`printf "Hello world." | gitgo-write -t a -t b -t c`
   assert_status 0 $?
 
-  git log -n1 --format="%B" $sha | assert_output "\
-Hello world.
----
-: a
-: b
-: c\
+  git log -n1 $sha | assert_output "\
+commit $sha
+Author: John Doe <john.doe@example.com>
+Date:   Wed Sep 8 07:06:05 2010 -0400
+
+    Hello world.
+    ---
+    : a
+    : b
+    : c
 " -
 }
 
@@ -61,9 +65,13 @@ test_write_ignores_empty_tags () {
   sha=`printf "Hello world." | gitgo-write -t "" -t "  "`
   assert_status 0 $?
 
-  git log -n1 --format="%B" $sha | assert_output "\
-Hello world.
----\
+  git log -n1 $sha | assert_output "\
+commit $sha
+Author: John Doe <john.doe@example.com>
+Date:   Wed Sep 8 07:06:05 2010 -0400
+
+    Hello world.
+    ---
 " -
 }
 
@@ -98,7 +106,7 @@ Author: John Doe <john.doe@example.com>
 Date:   Wed Sep 8 07:06:05 2010 -0400
 
     Parent A
-    ---\
+    ---
 " -
 }
 
@@ -106,9 +114,13 @@ test_write_ignores_empty_parents () {
   sha=`printf "Hello world." | gitgo-write "" "  "`
   assert_status 0 $?
 
-  git log -n1 --format="%B" $sha | assert_output "\
-Hello world.
----\
+  git log -n1 $sha | assert_output "\
+commit $sha
+Author: John Doe <john.doe@example.com>
+Date:   Wed Sep 8 07:06:05 2010 -0400
+
+    Hello world.
+    ---
 " -
 }
 
@@ -123,7 +135,7 @@ test_write_stores_attachments_in_tree  () {
   assert_status 0 $?
 
   git ls-tree $sha | assert_output "\
-100644 blob d95f3ad14dee633a758d2e331151e950dd13e4ed	file\
+100644 blob d95f3ad14dee633a758d2e331151e950dd13e4ed	file
 " -
 }
 
@@ -134,7 +146,7 @@ test_write_accepts_filenames_with_spaces  () {
   assert_status 0 $?
 
   git ls-tree $sha | assert_output "\
-100644 blob d95f3ad14dee633a758d2e331151e950dd13e4ed	filename with spaces\
+100644 blob d95f3ad14dee633a758d2e331151e950dd13e4ed	filename with spaces
 " -
 }
 
@@ -151,10 +163,14 @@ test_write_ignores_empty_attachments () {
 
 test_write_stores_commit_on_gitgo_branch () {
   sha=`printf "Hello world." | gitgo-write`
-  git log --format="%H" gitgo | assert_output "$sha" -
+  git log --format="%H" gitgo | assert_output "\
+$sha
+" -
 }
 
 test_write_stores_commit_on_b_branch () {
   sha=`printf "Hello world." | gitgo-write -b gitgo-alt`
-  git log --format="%H" gitgo-alt | assert_output "$sha" -
+  git log --format="%H" gitgo-alt | assert_output "\
+$sha
+" -
 }
