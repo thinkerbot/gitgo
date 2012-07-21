@@ -1,0 +1,2 @@
+#!/bin/sh
+ts $@ ./test/gitgo-*
