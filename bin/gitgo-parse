@@ -1,56 +1,35 @@
 #!/bin/bash
 ############################################################################
-usage="\
-usage: gitgo-parse [SINCE...UNTIL]
-
-  Parses the specified gitgo messages into node pairs a-la tsort.
-
-options:
-
-        -d    debug mode
-        -h    prints this help
-
-"
+# Routines to parse and process gitgo messages
+# . gitgo-parse
 ############################################################################
 
-while getopts "dh" option
-do
-  case $option in
-    d  )  debug="true" ;;
-    h  )  printf "$usage"
-          exit 0 ;;
-    \? )  printf "$usage" | head -n 1
-          exit 2 ;;
-  esac
-done
-shift $(($OPTIND - 1))
-
-if [ "$debug" == "true" ]
-then set -x
-fi
-
-############################################################################
-
-git log --format=raw $@ |
+# Produce a list of raw gitgo data between two refs a..b (as per git-log). The
+# raw format is:
+#
+#   commit type value
+#
+# Where type is one of the gitgo types [+-~:].
+raw_data () {
+a=$1; b=$2;
+git log --format=raw $a${b:+..}$b |
 awk '
-/^commit / {
-  print $2
-  n=0
-  next
-}
-/^    ---/ {
-  n=1
-  next
-}
-/^    [+-~:] / {
-  if ( n > 0) children[n++] = $0
-  next
-}
-/^$/ { 
-  for (i=1; i<n; i++) {
-    print children[i]
+BEGIN           { n=0 }
+/^commit /      { sha=$2; next }
+/^    ---/      { n=1; next }
+/^    [+-~:] /  { if ( n > 0 ) meta[n++] = $0; next }
+/^$/            { print_meta(n, meta) }
+                { n=0 }
+END             { print_meta(n, meta) }
+
+function print_meta(n, meta) {
+  if ( n > 0 ) {
+    for (i=n-1; i>0; i--) {
+      sub("    ", "", meta[i])
+      printf "%s %s\n", sha, meta[i]
+    }
+    printf "%s . %s\n", sha, sha
   }
-  next
 }
-{ n=0 }
 '
+}

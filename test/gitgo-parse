@@ -1,0 +1,67 @@
+#!/bin/sh
+. ts
+
+user_dir="$(pwd)"
+export PATH="$user_dir/bin:$PATH"
+
+. gitgo-parse
+
+setup () {
+  mkdir -p "$test_dir"
+  cd "$test_dir"
+  git init
+  export GIT_AUTHOR_NAME="John Doe"
+  export GIT_AUTHOR_EMAIL="john.doe@example.com"
+  export GIT_AUTHOR_DATE="2010-09-08T07:06:05-04:00"
+  export GIT_COMMITTER_NAME="John Doe"
+  export GIT_COMMITTER_EMAIL="john.doe@example.com"
+  export GIT_COMMITTER_DATE="2010-09-08T07:06:05-04:00"
+}
+
+teardown () {
+  cd "$user_dir"
+}
+
+#
+# raw_data
+#
+
+test_raw_data_prints_dot_pairs_for_messages () {
+a=`printf "A" | gitgo-write`
+b=`printf "B" | gitgo-write`
+c=`printf "C" | gitgo-write`
+
+raw_data $c | assert_output "\
+$c . $c
+$b . $b
+$a . $a
+" -
+}
+
+test_raw_data_prints_graph_relations () {
+a=`printf "A" | gitgo-write`
+b=`printf "B" | gitgo-write $a`
+c=`printf "C" | gitgo-write $a $b`
+
+raw_data $c | assert_output "\
+$c + $b
+$c + $a
+$c . $c
+$b + $a
+$b . $b
+$a . $a
+" -
+}
+
+test_raw_data_prints_tag_data () {
+a=`printf "A" | gitgo-write -t one -t two`
+b=`printf "B" | gitgo-write -t three`
+
+raw_data $b | assert_output "\
+$b : three
+$b . $b
+$a : two
+$a : one
+$a . $a
+" -
+}
