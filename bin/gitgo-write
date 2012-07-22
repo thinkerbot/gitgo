@@ -37,11 +37,11 @@ do
     b  )  branch="$OPTARG" ;;
     h  )  printf "$usage"
           exit 0 ;;
-    m  )  case $OPTARG in
+    m  )  case "$OPTARG" in
             add    )  mode="+" ;;
             delete )  mode="-" ;;
             update )  mode="~" ;;
-            \?     )  printf "invalid mode: $OPTARG" 
+            *      )  printf "invalid mode: $OPTARG\n"
                       exit 1 ;;
           esac ;;
     p  )  preview="true" ;;
