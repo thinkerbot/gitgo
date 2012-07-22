@@ -20,7 +20,7 @@ do
     h  )  printf "$usage"
           exit 0 ;;
     t  )  mode="tsort" ;;
-    \? )  printf "$usage" | head -n 1
+    \? )  printf "$usage" | head -n 1 >&2
           exit 2 ;;
   esac
 done

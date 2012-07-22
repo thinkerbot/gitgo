@@ -44,12 +44,12 @@ do
             add    )  mode="+" ;;
             delete )  mode="-" ;;
             update )  mode="~" ;;
-            *      )  printf "invalid mode: $OPTARG\n"
+            *      )  printf "invalid mode: $OPTARG\n" >&2
                       exit 1 ;;
           esac ;;
     p  )  preview="true" ;;
     t  )  tags="${tags}${OPTARG}\n" ;;
-    \? )  printf "$usage" | head -n 1
+    \? )  printf "$usage" | head -n 1 >&2
           exit 2 ;;
   esac
 done

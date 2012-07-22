@@ -247,7 +247,7 @@ Date:   Wed Sep 8 07:06:05 2010 -0400
 }
 
 test_write_exits_1_for_invalid_mode () {
-  msg=`printf "Hello World" | gitgo-write -m invalid`
+  msg=`printf "Hello World" | gitgo-write -m invalid 2>&1`
   assert_status 1 $?
   assert_output "invalid mode: invalid" "$msg"
 }
