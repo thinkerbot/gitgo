@@ -1,22 +1,25 @@
 #!/bin/bash
 ############################################################################
 usage="\
-usage: gitgo-meta [-h] [<since>] [<until>]
+usage: gitgo-meta [-h] [-t] [<since>] [<until>]
 
   Parses commits between the refs for gitgo metadata.
 
 options:
 
         -h    prints this help
+        -t    show shas in tsort order
 
 "
 ############################################################################
 
-while getopts "h" option
+mode="raw"
+while getopts "ht" option
 do
   case $option in
     h  )  printf "$usage"
           exit 0 ;;
+    t  )  mode="tsort" ;;
     \? )  printf "$usage" | head -n 1
           exit 2 ;;
   esac
@@ -65,4 +68,12 @@ function print_meta() {
 
 ############################################################################
 
-meta_data $a $b
+meta_data $a $b |
+if [ x"$mode" = x"tsort" ]
+then
+  grep -v ':' |
+  awk '{printf "%s %s\n", $3, $1}' |
+  tsort 
+else
+  cat
+fi

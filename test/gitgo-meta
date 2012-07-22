@@ -107,3 +107,19 @@ $b . $b
 $a . $a
 " -
 }
+
+#
+# -t option
+#
+
+test_t_option_lists_relations_in_tsort_order () {
+a=`printf "A" | gitgo-write`
+b=`printf "B" | gitgo-write $a`
+c=`printf "C" | gitgo-write $a $b`
+
+gitgo-meta -t $c | assert_output "\
+$a
+$b
+$c
+" -
+}
