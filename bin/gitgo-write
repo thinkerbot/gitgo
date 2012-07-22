@@ -17,7 +17,6 @@ options:
 
         -a    attachment files
         -b    the storage branch (default 'gitgo')
-        -d    debug mode
         -h    prints this help
         -t    specify tags
 
@@ -28,12 +27,11 @@ attachments=""
 branch="gitgo"
 tags=""
 mode="+"
-while getopts "a:b:dht:" option
+while getopts "a:b:ht:" option
 do
   case $option in
     a  )  attachments="${attachments}${OPTARG}\n" ;;
     b  )  branch="$OPTARG" ;;
-    d  )  debug="true" ;;
     h  )  printf "$usage"
           exit 0 ;;
     t  )  tags="${tags}${OPTARG}\n" ;;
@@ -43,7 +41,7 @@ do
 done
 shift $(($OPTIND - 1))
 
-if [ "$debug" == "true" ]
+if [ x"$GITGO_DEBUG" == x"true" ]
 then set -x
 fi
 

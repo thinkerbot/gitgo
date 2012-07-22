@@ -23,6 +23,10 @@ do
 done
 shift $(($OPTIND - 1))
 
+if [ x"$GITGO_DEBUG" == x"true" ]
+then set -x
+fi
+
 a=${1:-gitgo}
 b=${2}
 
