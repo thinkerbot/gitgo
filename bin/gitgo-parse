@@ -14,15 +14,16 @@ raw_data () {
 a=$1; b=$2;
 git log --format=raw $a${b:+..}$b |
 awk '
-BEGIN           { n=0 }
-/^commit /      { sha=$2; next }
-/^    ---/      { n=1; next }
-/^    [+-~:] /  { if ( n > 0 ) meta[n++] = $0; next }
-/^$/            { print_meta(n, meta) }
-                { n=0 }
-END             { print_meta(n, meta) }
+/^commit /      { n=0; sha=$2; }
+/^    ---/      { n=1; }
+/^    [+-~:] /  { store_meta() }
+/^$/            { print_meta() }
+END             { print_meta() }
 
-function print_meta(n, meta) {
+function store_meta () {
+  if ( n > 0 ) meta[n++] = $0
+}
+function print_meta() {
   if ( n > 0 ) {
     for (i=n-1; i>0; i--) {
       sub("    ", "", meta[i])
