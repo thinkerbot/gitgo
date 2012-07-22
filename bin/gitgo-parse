@@ -12,7 +12,7 @@
 # Where type is one of the gitgo types [+-~:].
 raw_data () {
 a=$1; b=$2;
-git log --format=raw $a${b:+..}$b |
+git log --format=raw $a${b:+...}$b |
 awk '
 /^commit /      { n=0; sha=$2; }
 /^    ---/      { n=1; }

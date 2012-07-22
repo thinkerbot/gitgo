@@ -38,6 +38,16 @@ $a . $a
 " -
 }
 
+test_raw_data_prints_data_until_second_sha () {
+a=`printf "A" | gitgo-write`
+b=`printf "B" | gitgo-write`
+c=`printf "C" | gitgo-write`
+
+raw_data $c $b | assert_output "\
+$c . $c
+" -
+}
+
 test_raw_data_prints_graph_relations () {
 a=`printf "A" | gitgo-write`
 b=`printf "B" | gitgo-write $a`
