@@ -83,3 +83,19 @@ $a . $a
 
 git log --oneline gitgo | wc -l | tr -d " \n" | assert_output "3" -
 }
+
+test_raw_data_skips_metadata_format_in_middle_of_message () {
+a=`printf "A" | gitgo-write`
+b=`printf "B
+---
++ 0123456789012345678901234567890123456789
++ abcdefabcdefabcdefabcdefabcdefabcdefabcd
++ 0123456789abcdef0123456789abcdef01234567
+" | gitgo-write $a`
+
+raw_data $b | assert_output "\
+$b + $a
+$b . $b
+$a . $a
+" -
+}
