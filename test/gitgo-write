@@ -229,3 +229,20 @@ Date:   Wed Sep 8 07:06:05 2010 -0400
     ~ $b
 " -
 }
+
+#
+# preview test
+#
+
+test_preview_prints_new_commit_and_does_not_update_head () {
+  a=`printf "Parent A" | gitgo-write`
+  git rev-parse gitgo | assert_output "\
+$a
+" -
+
+  printf "Child" | gitgo-write -p | assert_match "Child" -
+
+  git rev-parse gitgo | assert_output "\
+$a
+" -
+}

@@ -19,6 +19,7 @@ options:
         -b    the storage branch (default 'gitgo')
         -h    prints this help
         -m    linkage mode (add, update, delete)
+        -p    preview only
         -t    specify tags
 
 "
@@ -28,7 +29,8 @@ attachments=""
 branch="gitgo"
 tags=""
 mode="+"
-while getopts "a:b:hm:t:" option
+preview=""
+while getopts "a:b:hm:pt:" option
 do
   case $option in
     a  )  attachments="${attachments}${OPTARG}\n" ;;
@@ -42,6 +44,7 @@ do
             \?     )  printf "invalid mode: $OPTARG" 
                       exit 1 ;;
           esac ;;
+    p  )  preview="true" ;;
     t  )  tags="${tags}${OPTARG}\n" ;;
     \? )  printf "$usage" | head -n 1
           exit 2 ;;
@@ -101,4 +104,7 @@ parent=`git rev-parse --verify -q "$branch"`
 tree=`format_ls_tree "$attachments" | git mktree`
 sha=`cat - <(format_metadata "$tags" "$mode" $@) | git commit-tree "$tree" ${parent:+-p} $parent`
 
-printf "%s\n" "$sha" | tee .git/refs/heads/"$branch"
+if [ "$preview" ]
+then git log -n1 --format=raw "$sha"
+else printf "%s\n" "$sha" | tee .git/refs/heads/"$branch"
+fi
