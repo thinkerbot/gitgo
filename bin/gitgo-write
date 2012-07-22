@@ -1,7 +1,7 @@
 #!/bin/bash
 ############################################################################
 usage="\
-usage: gitgo-write [-a ATTACHMENT...] [-b BRANCH] [-h] [-m MODE] [-t TAG...] [THREAD...]
+usage: gitgo-write [-a ATTACHMENT...] [-b BRANCH] [-f] [-h] [-m MODE] [-t TAG...] [THREAD...]
 
   Writes a message to the 'gitgo' branch to the specified threads. If the
   branch does not exist, it will be created.
@@ -17,6 +17,7 @@ options:
 
         -a    attachment files
         -b    the storage branch (default 'gitgo')
+        -f    force write unresolvable threads
         -h    prints this help
         -m    linkage mode (add, update, delete)
         -p    preview only
@@ -27,14 +28,16 @@ options:
 
 attachments=""
 branch="gitgo"
-tags=""
+force=""
 mode="+"
 preview=""
-while getopts "a:b:hm:pt:" option
+tags=""
+while getopts "a:b:fhm:pt:" option
 do
   case $option in
     a  )  attachments="${attachments}${OPTARG}\n" ;;
     b  )  branch="$OPTARG" ;;
+    f  )  force="true" ;;
     h  )  printf "$usage"
           exit 0 ;;
     m  )  case "$OPTARG" in
@@ -92,8 +95,14 @@ format_metadata () {
   do
     if [ "$parent" ]
     then
-      parent=`git rev-parse --verify -q "$parent"`
-      printf "%s %s\n" "$mode" "$parent"
+      ref=`git rev-parse --verify -q "$parent"`
+      if [ $? -eq 0 ] || [ $force ]
+      then
+        printf "%s %s\n" "$mode" "${ref:-$parent}"
+      else
+        printf "could not resolve ref: $parent\n" >&2
+        exit 1
+      fi
     fi
   done
 }
@@ -101,8 +110,11 @@ format_metadata () {
 ############################################################################
 
 parent=`git rev-parse --verify -q "$branch"`
+
+set -e
+metadata=`format_metadata "$tags" "$mode" $@`
 tree=`format_ls_tree "$attachments" | git mktree`
-sha=`cat - <(format_metadata "$tags" "$mode" $@) | git commit-tree "$tree" ${parent:+-p} $parent`
+sha=`cat - <( printf "%b" "$metadata" ) | git commit-tree "$tree" ${parent:+-p} $parent`
 
 if [ "$preview" ]
 then git log -n1 --format=raw "$sha"

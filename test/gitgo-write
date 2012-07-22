@@ -124,6 +124,22 @@ Date:   Wed Sep 8 07:06:05 2010 -0400
 " -
 }
 
+test_write_resolves_parents () {
+  a=`printf "Parent" | gitgo-write`
+  b=`printf "Child" | gitgo-write ${a%.}`
+  git log -n1 $b | assert_match "+ $a" -
+}
+
+test_write_exits_1_for_parents_that_cannot_be_resolved_to_a_ref () {
+  msg=`printf "Hello World" | gitgo-write invalid 2>&1`
+  assert_status 1 $?
+  assert_output "could not resolve ref: invalid" "$msg"
+}
+
+test_write_accepts_unresolvable_parents_with_force () {
+  printf "Hello World" | gitgo-write -pf invalid | assert_match "\+ invalid" -
+}
+
 #
 # attachments
 #
