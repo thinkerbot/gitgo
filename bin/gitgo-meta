@@ -1,16 +1,40 @@
 #!/bin/bash
 ############################################################################
-# Routines to parse and process gitgo messages
-# . gitgo-parse
+usage="\
+usage: gitgo-meta [-h] [<since>] [<until>]
+
+  Parses commits between the refs for gitgo metadata.
+
+options:
+
+        -h    prints this help
+
+"
 ############################################################################
 
-# Produce a list of raw gitgo data between two refs a..b (as per git-log). The
-# raw format is:
+while getopts "h" option
+do
+  case $option in
+    h  )  printf "$usage"
+          exit 0 ;;
+    \? )  printf "$usage" | head -n 1
+          exit 2 ;;
+  esac
+done
+shift $(($OPTIND - 1))
+
+a=${1:-gitgo}
+b=${2}
+
+############################################################################
+
+# Produce a list of raw gitgo metadata between two refs a..b (as per git-log).
+# The output format is:
 #
 #   commit type value
 #
 # Where type is one of the gitgo types [+-~:].
-raw_data () {
+meta_data () {
 a=$1; b=$2;
 git log --format=raw $a${b:+...}$b |
 awk '
@@ -34,3 +58,7 @@ function print_meta() {
 }
 '
 }
+
+############################################################################
+
+meta_data $a $b

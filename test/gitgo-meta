@@ -4,8 +4,6 @@
 user_dir="$(pwd)"
 export PATH="$user_dir/bin:$PATH"
 
-. gitgo-parse
-
 setup () {
   mkdir -p "$test_dir"
   cd "$test_dir"
@@ -23,37 +21,37 @@ teardown () {
 }
 
 #
-# raw_data
+# gitgo_meta
 #
 
-test_raw_data_prints_dot_pairs_for_messages () {
+test_gitgo_meta_prints_dot_pairs_for_messages () {
 a=`printf "A" | gitgo-write`
 b=`printf "B" | gitgo-write`
 c=`printf "C" | gitgo-write`
 
-raw_data $c | assert_output "\
+gitgo-meta $c | assert_output "\
 $c . $c
 $b . $b
 $a . $a
 " -
 }
 
-test_raw_data_prints_data_until_second_sha () {
+test_gitgo_meta_prints_data_until_second_sha () {
 a=`printf "A" | gitgo-write`
 b=`printf "B" | gitgo-write`
 c=`printf "C" | gitgo-write`
 
-raw_data $c $b | assert_output "\
+gitgo-meta $c $b | assert_output "\
 $c . $c
 " -
 }
 
-test_raw_data_prints_graph_relations () {
+test_gitgo_meta_prints_graph_relations () {
 a=`printf "A" | gitgo-write`
 b=`printf "B" | gitgo-write $a`
 c=`printf "C" | gitgo-write $a $b`
 
-raw_data $c | assert_output "\
+gitgo-meta $c | assert_output "\
 $c + $b
 $c + $a
 $c . $c
@@ -63,11 +61,11 @@ $a . $a
 " -
 }
 
-test_raw_data_prints_tag_data () {
+test_gitgo_meta_prints_tag_data () {
 a=`printf "A" | gitgo-write -t one -t two`
 b=`printf "B" | gitgo-write -t three`
 
-raw_data $b | assert_output "\
+gitgo-meta $b | assert_output "\
 $b : three
 $b . $b
 $a : two
@@ -76,7 +74,7 @@ $a . $a
 " -
 }
 
-test_raw_data_skips_commits_without_metadata () {
+test_gitgo_meta_skips_commits_without_metadata () {
 a=`printf "A" | gitgo-write`
 
 tree=`git mktree <&-`
@@ -85,7 +83,7 @@ printf "%s\n" "$sha"  > $test_dir/.git/refs/heads/gitgo
 
 b=`printf "B" | gitgo-write $a`
 
-raw_data $b | assert_output "\
+gitgo-meta $b | assert_output "\
 $b + $a
 $b . $b
 $a . $a
@@ -94,7 +92,7 @@ $a . $a
 git log --oneline gitgo | wc -l | tr -d " \n" | assert_output "3" -
 }
 
-test_raw_data_skips_metadata_format_in_middle_of_message () {
+test_gitgo_meta_skips_metadata_format_in_middle_of_message () {
 a=`printf "A" | gitgo-write`
 b=`printf "B
 ---
@@ -103,7 +101,7 @@ b=`printf "B
 + 0123456789abcdef0123456789abcdef01234567
 " | gitgo-write $a`
 
-raw_data $b | assert_output "\
+gitgo-meta $b | assert_output "\
 $b + $a
 $b . $b
 $a . $a
