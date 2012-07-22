@@ -174,3 +174,58 @@ test_write_stores_commit_on_b_branch () {
 $sha
 " -
 }
+
+#
+# mode test
+#
+
+test_write_allows_specification_of_mode () {
+  a=`printf "Parent A" | gitgo-write`
+  b=`printf "Parent B" | gitgo-write`
+  c=`printf "Child"    | gitgo-write -m add $a $b`
+
+  git log -n1 $c | assert_output "\
+commit $c
+Author: John Doe <john.doe@example.com>
+Date:   Wed Sep 8 07:06:05 2010 -0400
+
+    Child
+    ---
+    + $a
+    + $b
+" -
+}
+
+test_write_appends_parents_prefixed_by_minus_for_delete_mode () {
+  a=`printf "Parent A" | gitgo-write`
+  b=`printf "Parent B" | gitgo-write`
+  c=`printf "Child"    | gitgo-write -m delete $a $b`
+
+  git log -n1 $c | assert_output "\
+commit $c
+Author: John Doe <john.doe@example.com>
+Date:   Wed Sep 8 07:06:05 2010 -0400
+
+    Child
+    ---
+    - $a
+    - $b
+" -
+}
+
+test_write_appends_parents_prefixed_by_tilde_for_update_mode () {
+  a=`printf "Parent A" | gitgo-write`
+  b=`printf "Parent B" | gitgo-write`
+  c=`printf "Child"    | gitgo-write -m update $a $b`
+
+  git log -n1 $c | assert_output "\
+commit $c
+Author: John Doe <john.doe@example.com>
+Date:   Wed Sep 8 07:06:05 2010 -0400
+
+    Child
+    ---
+    ~ $a
+    ~ $b
+" -
+}
