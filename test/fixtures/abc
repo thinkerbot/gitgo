@@ -1,0 +1,15 @@
+#!/bin/sh
+
+user_dir="$(pwd)"
+export PATH="$user_dir/bin:$PATH"
+export GIT_DIR="$user_dir/test/fixtures/abc.git"
+
+rm -rf "$GIT_DIR"
+mkdir -p "$(dirname "$GIT_DIR")"
+git init > /dev/null
+
+a=$(printf "A" | ./bin/gitgo-write -b master)
+b=$(printf "B" | ./bin/gitgo-write -b master "$a")
+c=$(printf "C" | ./bin/gitgo-write -b master "$b")
+
+git log
