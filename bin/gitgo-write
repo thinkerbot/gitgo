@@ -114,7 +114,7 @@ parent=`git rev-parse --verify -q "$branch"`
 set -e
 metadata=`format_metadata "$tags" "$mode" $@`
 tree=`format_ls_tree "$attachments" | git mktree`
-sha=`cat - <( printf "%b" "$metadata" ) | git commit-tree "$tree" ${parent:+-p} $parent`
+sha=`cat - <( printf "%b\n" "$metadata" ) | git commit-tree "$tree" ${parent:+-p} $parent`
 
 if [ "$preview" ]
 then
