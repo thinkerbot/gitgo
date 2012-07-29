@@ -8,8 +8,8 @@ rm -rf "$GIT_DIR"
 mkdir -p "$(dirname "$GIT_DIR")"
 git init > /dev/null
 
-a=$(printf "A" | ./bin/gitgo-write -b master)
-b=$(printf "B" | ./bin/gitgo-write -b master "$a")
-c=$(printf "C" | ./bin/gitgo-write -b master "$b")
+a=$(printf "A" | gitgo-write)
+b=$(printf "B" | gitgo-write "$a")
+c=$(printf "C" | gitgo-write "$b")
 
-git log
+git log gitgo

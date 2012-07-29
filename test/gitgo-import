@@ -1,0 +1,24 @@
+#!/bin/sh
+. ts
+
+user_dir="$(pwd)"
+export PATH="$user_dir/bin:$PATH"
+
+setup () {
+  mkdir -p "$test_dir"
+  cd "$test_dir"
+}
+
+teardown () {
+  cd "$user_dir"
+}
+
+use () {
+  # git clone errors with bad file descriptor when stdin is closed
+  echo | git clone -b gitgo "$user_dir/test/fixtures/$1.git" . > /dev/null
+}
+
+test_use_of_fixtures () {
+  use 'abc'
+  git fast-export gitgo
+}
