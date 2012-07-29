@@ -1,0 +1,72 @@
+#!/bin/bash
+############################################################################
+usage="\
+usage: gitgo-import [-h] [-p] MARKS_FILE [EXPORT_FILE...]
+
+  Import a git-fast-export into a gitgo namespace.
+
+options:
+
+        -h    prints this help
+        -p    preview mode
+
+"
+############################################################################
+
+preview=false
+while getopts "hp" option
+do
+  case $option in
+    h  )  printf "$usage"
+          exit 0 ;;
+    p  )  preview=true ;;
+    \? )  printf "$usage" | head -n 1 >&2
+          exit 2 ;;
+  esac
+done
+shift $(($OPTIND - 1))
+
+if [ x"$GITGO_DEBUG" == x"true" ]
+then set -x
+fi
+
+marks_file=${1}
+shift 1
+
+############################################################################
+
+git fast-export --export-marks=export_marks gitgo > export_file
+
+map_marks () {
+sed -nle "$(
+awk '
+BEGIN { printf "/ \+ /!p\n" }
+      { printf "s/%s/%s/p\n", $2, $1 }
+' < export_marks
+)"
+}
+
+awk '
+/mark/ {
+  mark=$2
+}
+/data/ {
+  msg = ""; len = $2
+  while(length(msg) < len && getline == 1) {
+    msg = msg $0 "\n"
+  }
+
+  gsub(".*\n---\n", "", msg)
+  split(msg, meta, "\n")
+
+  printf "%s = %s\n", mark, len
+  for(i=1; i<length(meta); i++) printf "%s %s\n", mark, meta[i]
+  printf "%s . \n", mark
+}
+' < export_file | 
+map_marks |
+awk '
+/\./  { if(head[$1] == "") head[$1] = $1; $3 = head[$1] }
+/\+/  { head[$1] = head[$1] head[$3] " " }
+      { print $0 }
+'
