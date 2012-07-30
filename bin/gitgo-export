@@ -41,7 +41,7 @@ BEGIN {
   printf "  mark = $0\n"
 }
 { 
-  printf "  sub(\"mark %s\", \"# %s\")\n", $1, $2
+  printf "  sub(\"mark %s$\", \"# %s\")\n", $1, $2
 }
 END {
   printf "  printf \"%%s\\n%%s\\n%%s\\n\", $0, commit, mark\n"
