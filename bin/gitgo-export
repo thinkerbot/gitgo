@@ -1,0 +1,68 @@
+#!/bin/bash
+############################################################################
+usage="\
+usage: gitgo-export [-h]
+
+options:
+
+        -h    prints this help
+
+"
+############################################################################
+
+preview=false
+while getopts "hp" option
+do
+  case $option in
+    h  )  printf "$usage"
+          exit 0 ;;
+    p  )  preview=true ;;
+    \? )  printf "$usage" | head -n 1 >&2
+          exit 2 ;;
+  esac
+done
+shift $(($OPTIND - 1))
+
+if [ x"$GITGO_DEBUG" == x"true" ]
+then set -x
+fi
+
+############################################################################
+
+# Create the output that hopefully will be possible for fast-export
+git fast-export --export-marks=export_marks gitgo > export_file
+
+rewrite () {
+awk '
+BEGIN {
+  printf "/^commit / {\n"
+  printf "  commit = $0\n"
+  printf "  getline\n"
+  printf "  mark = $0\n"
+}
+{ 
+  printf "  sub(\"mark %s\", \"# %s\")\n", $1, $2
+}
+END {
+  printf "  printf \"%%s\\n%%s\\n%%s\\n\", $0, commit, mark\n"
+  printf "  next\n"
+  printf "}\n"
+  printf "/^data / {\n"
+  printf "  print\n"
+  printf "  bytes = $2\n"
+  printf "  while(bytes > 0 && getline == 1) {\n"
+  printf "    bytes -= length + 1\n"
+  printf "    print\n"  
+  printf "  }\n"
+  printf "  next\n"
+  printf "}\n"
+  printf "{ print }\n"
+}
+' < $1
+}
+
+awk "$(
+rewrite export_marks
+)" < export_file
+
+rm export_marks export_file

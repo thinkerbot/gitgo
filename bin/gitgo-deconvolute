@@ -1,0 +1,87 @@
+#!/usr/bin/env ruby
+
+class Entry
+  attr_reader :sha, :commit, :mark, :author, :committer, :body, :meta, :tree
+  attr_reader :marks, :tags, :remap
+
+  LEADER = "---\n"
+
+  def initialize
+    reset
+    @marks = {}
+    @tags  = Hash.new {|hash, key| hash[key] = [] }
+    @remap = {}
+  end
+
+  def reset
+    @sha, @commit, @mark, @author, @committer, @body = nil
+    @tree = []
+    @meta = []
+  end
+
+  def read(io = $stdin)
+    reset
+
+    while line = io.gets
+      break if line == "\n"
+
+      key, value = line.split(' ', 2)
+
+      case key
+      when "#"
+        @sha = value.chomp
+      when "commit"
+        @commit = value
+      when "mark"
+        @mark = value
+        marks[sha] = mark
+      when "author"
+        @author = value
+      when "committer"
+        @committer = value
+      when "data"
+        @body = io.read(value.chomp.to_i)
+
+        if body =~ /(.*)#{LEADER}([+-:] .*\n)*\z/m
+          @body = $1
+          @meta = $2.to_s.split("\n")
+        end
+
+      when "from", "merge"
+        next
+      else
+        tree << line
+      end
+    end
+
+    commit && (author || committer) && body ? true : false
+  end
+
+  def write(io = $stdout)
+    return if meta.nil?
+
+    io.print "commit #{commit}"
+    io.print "mark #{mark}" if mark
+    io.print "author #{author}" if author
+    io.print "committer #{committer}" if committer
+    io.print "data #{body.length}\n"
+    io.print body
+
+    meta.each do |line|
+      type, value = line.split(' ', 2)
+      case type
+      when "+" then io.print "from #{marks[value]}"
+      when ":" then tags[value] << sha
+      when "-" then remap[marks[value]] = mark
+      else raise "invalid metadata: #{line}"
+      end
+    end
+
+    io.puts
+  end
+end
+
+entry = Entry.new
+while entry.read
+  entry.write
+end
