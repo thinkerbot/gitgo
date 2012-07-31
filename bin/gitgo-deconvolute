@@ -2,7 +2,7 @@
 
 class Entry
   attr_reader :sha, :commit, :mark, :author, :committer, :body, :meta, :tree
-  attr_reader :marks, :tags, :remap
+  attr_reader :marks, :tags, :remap, :heads
 
   LEADER = "---\n"
 
@@ -11,6 +11,7 @@ class Entry
     @marks = {}
     @tags  = Hash.new {|hash, key| hash[key] = [] }
     @remap = {}
+    @heads = {}
   end
 
   def reset
@@ -60,21 +61,33 @@ class Entry
   def write(io = $stdout)
     return if meta.nil?
 
-    io.print "commit #{commit}"
+    parents = []
+    meta.each do |line|
+      type, value = line.split(' ', 2)
+
+      case type
+      when "+" then parents << marks[value]
+      when ":" then tags[value] << sha
+      when "-" then remap[value] = sha
+      else raise "invalid metadata: #{line}"
+      end
+    end
+    parent = parents.shift
+    heads[mark] = heads[parent] || mark[1..-1]
+
+    io.print "commit refs/heads/#{heads[mark]}"
     io.print "mark #{mark}" if mark
     io.print "author #{author}" if author
     io.print "committer #{committer}" if committer
     io.print "data #{body.length}\n"
     io.print body
 
-    meta.each do |line|
-      type, value = line.split(' ', 2)
-      case type
-      when "+" then io.print "from #{marks[value]}"
-      when ":" then tags[value] << sha
-      when "-" then remap[marks[value]] = mark
-      else raise "invalid metadata: #{line}"
-      end
+    if parent
+    io.print "from #{parent}"
+    end
+
+    parents.each do |parent|
+    io.print "merge #{parent}"
     end
 
     io.puts
