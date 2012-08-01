@@ -66,16 +66,16 @@ class Entry
       type, value = line.split(' ', 2)
 
       case type
-      when "+" then parents << marks[value]
+      when "+" then parents << value
       when ":" then tags[value] << sha
       when "-" then remap[value] = sha
       else raise "invalid metadata: #{line}"
       end
     end
     parent = parents.shift
-    heads[mark] = heads[parent] || mark[1..-1]
+    heads[sha] = heads[parent] || sha
 
-    io.print "commit refs/heads/#{heads[mark]}"
+    io.print "commit refs/namespaces/gitgo/heads/#{heads[sha]}\n"
     io.print "mark #{mark}" if mark
     io.print "author #{author}" if author
     io.print "committer #{committer}" if committer
@@ -83,11 +83,11 @@ class Entry
     io.print body
 
     if parent
-    io.print "from #{parent}"
+    io.print "from #{marks[parent]}"
     end
 
     parents.each do |parent|
-    io.print "merge #{parent}"
+    io.print "merge #{marks[parent]}"
     end
 
     io.puts
