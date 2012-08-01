@@ -1,68 +1,146 @@
-#!/bin/bash
-############################################################################
-usage="\
+#!/usr/bin/env ruby
+begin
+require 'optparse'
+
+OptionParser.new do |opts|
+  opts.banner = %{
 usage: gitgo-export [-h]
 
+  Exports gitgo branches in the format used by git-fast-import.
+
 options:
+}.lstrip
+  opts.on("-h", "print this help") do
+    puts opts
+    puts
+    exit
+  end
+end.parse!
 
-        -h    prints this help
+args = ARGV.dup
+ARGV.clear
 
-"
-############################################################################
+#############################################################################
+class Entry
+  attr_reader :sha, :commit, :mark, :author, :committer, :body, :meta, :tree
+  attr_reader :marks, :tags, :remap, :heads
 
-preview=false
-while getopts "hp" option
-do
-  case $option in
-    h  )  printf "$usage"
-          exit 0 ;;
-    p  )  preview=true ;;
-    \? )  printf "$usage" | head -n 1 >&2
-          exit 2 ;;
-  esac
-done
-shift $(($OPTIND - 1))
+  LEADER = "---\n"
 
-if [ x"$GITGO_DEBUG" == x"true" ]
-then set -x
-fi
+  def initialize(marks = {})
+    reset
+    @marks = marks
+    @tags  = Hash.new {|hash, key| hash[key] = [] }
+    @remap = {}
+    @heads = {}
+  end
 
-############################################################################
+  def reset
+    @sha, @commit, @mark, @author, @committer, @body = nil
+    @tree = []
+    @meta = []
+  end
 
-# Create the output that hopefully will be possible for fast-export
-git fast-export --export-marks=export_marks gitgo > export_file
+  def read(io = $stdin)
+    reset
 
-rewrite () {
-awk '
-BEGIN {
-  printf "/^commit / {\n"
-  printf "  commit = $0\n"
-  printf "  getline\n"
-  printf "  mark = $0\n"
-}
-{ 
-  printf "  sub(\"mark %s$\", \"# %s\")\n", $1, $2
-}
-END {
-  printf "  printf \"%%s\\n%%s\\n%%s\\n\", $0, commit, mark\n"
-  printf "  next\n"
-  printf "}\n"
-  printf "/^data / {\n"
-  printf "  print\n"
-  printf "  bytes = $2\n"
-  printf "  while(bytes > 0 && getline == 1) {\n"
-  printf "    bytes -= length + 1\n"
-  printf "    print\n"  
-  printf "  }\n"
-  printf "  next\n"
-  printf "}\n"
-  printf "{ print }\n"
-}
-' < $1
-}
+    while line = io.gets
+      break if line == "\n"
 
-awk "$(
-rewrite export_marks
-)" < export_file
+      key, value = line.split(' ', 2)
 
-rm export_marks export_file
+      case key
+      when "commit"
+        @commit = value
+      when "mark"
+        @mark = value
+        @sha  = marks[mark.chomp]
+      when "author"
+        @author = value
+      when "committer"
+        @committer = value
+      when "data"
+        @body = io.read(value.chomp.to_i)
+
+        if body =~ /(.*)#{LEADER}([+-:] .*\n)*\z/m
+          @body = $1
+          @meta = $2.to_s.split("\n")
+        end
+
+      when "from", "merge"
+        next
+      else
+        tree << line
+      end
+    end
+
+    commit && (author || committer) && body ? true : false
+  end
+
+  def write(io = $stdout)
+    return if meta.nil?
+
+    parents = []
+    meta.each do |line|
+      type, value = line.split(' ', 2)
+
+      case type
+      when "+" then parents << value
+      when ":" then tags[value] << sha
+      when "-" then remap[value] = sha
+      else raise "invalid metadata: #{line}"
+      end
+    end
+    parent = parents.shift
+    heads[sha] = heads[parent] || sha
+
+    io.print "commit refs/namespaces/gitgo/heads/#{heads[sha]}\n"
+    io.print "mark #{mark}" if mark
+    io.print "author #{author}" if author
+    io.print "committer #{committer}" if committer
+    io.print "data #{body.length}\n"
+    io.print body
+
+    if parent
+    io.print "from #{marks[parent]}\n"
+    end
+
+    parents.each do |parent|
+    io.print "merge #{marks[parent]}\n"
+    end
+
+    io.puts
+  end
+end
+
+`git fast-export --export-marks=export_marks gitgo > export_file`
+
+marks = {}
+File.open('export_marks') do |io|
+  io.each_line do |line|
+    mark, sha = line.split
+    marks[sha] = mark
+    marks[mark] = sha
+  end
+end
+
+File.open('export_file') do |io|
+  entry = Entry.new(marks)
+  while entry.read(io)
+    entry.write
+  end
+end
+
+File.unlink 'export_marks'
+File.unlink 'export_file'
+
+#############################################################################
+rescue Interrupt
+  exit 130
+rescue Errno::EPIPE 
+  exit 0
+rescue
+  raise if $DEBUG
+  $stderr.puts $!.message
+  exit 1
+end

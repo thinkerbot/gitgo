@@ -1,0 +1,53 @@
+#!/bin/sh
+. ts
+
+user_dir="$(pwd)"
+export PATH="$user_dir/bin:$PATH"
+
+setup () {
+  mkdir -p "$test_dir"
+  cd "$test_dir"
+}
+
+teardown () {
+  cd "$user_dir"
+}
+
+use () {
+  # git clone errors with bad file descriptor when stdin is closed
+  echo | git clone -b gitgo "$user_dir/test/fixtures/$1.git" . > /dev/null
+  git fast-export --no-data --export-marks=export_marks gitgo > export_file
+}
+
+#
+# basic
+#
+
+test_export_prints_deconvoluted_export_data () {
+  use 'abc'
+  gitgo-export | assert_output "\
+commit refs/namespaces/gitgo/heads/afefc3ddd59359992dda2cb5c59a346befe277ed
+mark :1
+author Simon Chiang <simon.a.chiang@gmail.com> 1343590190 -0600
+committer Simon Chiang <simon.a.chiang@gmail.com> 1343590190 -0600
+data 2
+A
+
+commit refs/namespaces/gitgo/heads/afefc3ddd59359992dda2cb5c59a346befe277ed
+mark :2
+author Simon Chiang <simon.a.chiang@gmail.com> 1343590190 -0600
+committer Simon Chiang <simon.a.chiang@gmail.com> 1343590190 -0600
+data 2
+B
+from :1
+
+commit refs/namespaces/gitgo/heads/afefc3ddd59359992dda2cb5c59a346befe277ed
+mark :3
+author Simon Chiang <simon.a.chiang@gmail.com> 1343590191 -0600
+committer Simon Chiang <simon.a.chiang@gmail.com> 1343590191 -0600
+data 2
+C
+from :2
+
+" -
+}
