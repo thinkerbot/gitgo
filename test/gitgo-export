@@ -1,8 +1,6 @@
 #!/bin/sh
 . ts
-
-user_dir="$(pwd)"
-export PATH="$user_dir/bin:$PATH"
+. test/env
 
 setup () {
   mkdir -p "$test_dir"
@@ -26,25 +24,25 @@ use () {
 test_export_prints_deconvoluted_export_data () {
   use 'abc'
   gitgo-export | assert_output "\
-commit refs/namespaces/gitgo/heads/afefc3ddd59359992dda2cb5c59a346befe277ed
+commit refs/namespaces/gitgo/heads/1d46e67766042c5944705377eaf0db511e7b2caf
 mark :1
-author Simon Chiang <simon.a.chiang@gmail.com> 1343590190 -0600
-committer Simon Chiang <simon.a.chiang@gmail.com> 1343590190 -0600
+author John Doe <john.doe@example.com> 1283943965 -0400
+committer John Doe <john.doe@example.com> 1283943965 -0400
 data 2
 A
 
-commit refs/namespaces/gitgo/heads/afefc3ddd59359992dda2cb5c59a346befe277ed
+commit refs/namespaces/gitgo/heads/1d46e67766042c5944705377eaf0db511e7b2caf
 mark :2
-author Simon Chiang <simon.a.chiang@gmail.com> 1343590190 -0600
-committer Simon Chiang <simon.a.chiang@gmail.com> 1343590190 -0600
+author John Doe <john.doe@example.com> 1283943965 -0400
+committer John Doe <john.doe@example.com> 1283943965 -0400
 data 2
 B
 from :1
 
-commit refs/namespaces/gitgo/heads/afefc3ddd59359992dda2cb5c59a346befe277ed
+commit refs/namespaces/gitgo/heads/1d46e67766042c5944705377eaf0db511e7b2caf
 mark :3
-author Simon Chiang <simon.a.chiang@gmail.com> 1343590191 -0600
-committer Simon Chiang <simon.a.chiang@gmail.com> 1343590191 -0600
+author John Doe <john.doe@example.com> 1283943965 -0400
+committer John Doe <john.doe@example.com> 1283943965 -0400
 data 2
 C
 from :2

@@ -1,7 +1,6 @@
 #!/bin/sh
+. test/env
 
-user_dir="$(pwd)"
-export PATH="$user_dir/bin:$PATH"
 export GIT_DIR="$user_dir/test/fixtures/abc.git"
 
 rm -rf "$GIT_DIR"

@@ -1,19 +1,11 @@
 #!/bin/sh
 . ts
-
-user_dir="$(pwd)"
-export PATH="$user_dir/bin:$PATH"
+. test/env
 
 setup () {
   mkdir -p "$test_dir"
   cd "$test_dir"
   git init
-  export GIT_AUTHOR_NAME="John Doe"
-  export GIT_AUTHOR_EMAIL="john.doe@example.com"
-  export GIT_AUTHOR_DATE="2010-09-08T07:06:05-04:00"
-  export GIT_COMMITTER_NAME="John Doe"
-  export GIT_COMMITTER_EMAIL="john.doe@example.com"
-  export GIT_COMMITTER_DATE="2010-09-08T07:06:05-04:00"
 }
 
 teardown () {
