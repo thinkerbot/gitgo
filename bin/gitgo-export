@@ -1,19 +1,31 @@
 #!/usr/bin/env ruby
 begin
 require 'optparse'
+require 'fileutils'
 
+full = false
+preview = false
 OptionParser.new do |opts|
   opts.banner = %{
-usage: gitgo-export [-h]
+usage: gitgo-export [-f] [-h] [-p]
 
   Exports gitgo branches in the format used by git-fast-import.
 
 options:
 }.lstrip
+
+  opts.on("-f", "full export") do
+    full = true
+  end
+
   opts.on("-h", "print this help") do
     puts opts
     puts
     exit
+  end
+
+  opts.on("-p", "preview - do not update marks") do
+    preview = true
   end
 end.parse!
 
@@ -22,8 +34,8 @@ ARGV.clear
 
 #############################################################################
 class Entry
-  attr_reader :sha, :commit, :mark, :author, :committer, :body, :meta, :tree
-  attr_reader :marks, :tags, :remap, :heads
+  attr_accessor :sha, :commit, :mark, :author, :committer, :body, :meta, :tree
+  attr_reader :marks, :tags, :remap
 
   LEADER = "---\n"
 
@@ -32,7 +44,6 @@ class Entry
     @marks = marks
     @tags  = Hash.new {|hash, key| hash[key] = [] }
     @remap = {}
-    @heads = {}
   end
 
   def reset
@@ -91,17 +102,15 @@ class Entry
       else raise "invalid metadata: #{line}"
       end
     end
-    parent = parents.shift
-    heads[sha] = heads[parent] || sha
 
-    io.print "commit refs/namespaces/gitgo/heads/#{heads[sha]}\n"
+    io.print "commit #{commit}\n"
     io.print "mark #{mark}" if mark
     io.print "author #{author}" if author
     io.print "committer #{committer}" if committer
     io.print "data #{body.length}\n"
     io.print body
 
-    if parent
+    if parent = parents.shift
     io.print "from #{marks[parent]}\n"
     end
 
@@ -113,10 +122,25 @@ class Entry
   end
 end
 
-`git fast-export --export-marks=export_marks gitgo > export_file`
+gitgo_dir = ENV['GITGO_DIR'] || File.join(`git rev-parse --git-dir`.chomp("\n"), 'gitgo')
+export_dir = File.expand_path("export", gitgo_dir)
+marks_file  = File.join(export_dir, "marks")
+export_file = File.join(export_dir, "file")
+
+if full && File.exists?(marks_file)
+  FileUtils.rm marks_file
+end
+
+unless File.exists?(export_dir)
+  FileUtils.mkdir_p export_dir
+end
+
+FileUtils.touch marks_file
+
+`git fast-export --import-marks='#{marks_file}' --export-marks='#{preview ? '/dev/null' : marks_file}' gitgo > '#{export_file}'`
 
 marks = {}
-File.open('export_marks') do |io|
+File.open(marks_file) do |io|
   io.each_line do |line|
     mark, sha = line.split
     marks[sha] = mark
@@ -124,15 +148,15 @@ File.open('export_marks') do |io|
   end
 end
 
-File.open('export_file') do |io|
+File.open(export_file) do |io|
   entry = Entry.new(marks)
   while entry.read(io)
+    entry.commit = "refs/heads/gitgo-import"
     entry.write
   end
 end
 
-File.unlink 'export_marks'
-File.unlink 'export_file'
+File.unlink export_file
 
 #############################################################################
 rescue Interrupt

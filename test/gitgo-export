@@ -1,10 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 . ts
 . test/env
 
 setup () {
   mkdir -p "$test_dir"
   cd "$test_dir"
+  gitgo_dir=".git/gitgo/export"
 }
 
 teardown () {
@@ -14,7 +15,10 @@ teardown () {
 use () {
   # git clone errors with bad file descriptor when stdin is closed
   echo | git clone -b gitgo "$user_dir/test/fixtures/$1.git" . > /dev/null
-  git fast-export --no-data --export-marks=export_marks gitgo > export_file
+}
+
+count () {
+  grep -c "$1" | tr -d "\n"
 }
 
 #
@@ -24,14 +28,14 @@ use () {
 test_export_prints_deconvoluted_export_data () {
   use 'abc'
   gitgo-export | assert_output "\
-commit refs/namespaces/gitgo/heads/1d46e67766042c5944705377eaf0db511e7b2caf
+commit refs/heads/gitgo-import
 mark :1
 author John Doe <john.doe@example.com> 1283943965 -0400
 committer John Doe <john.doe@example.com> 1283943965 -0400
 data 2
 A
 
-commit refs/namespaces/gitgo/heads/1d46e67766042c5944705377eaf0db511e7b2caf
+commit refs/heads/gitgo-import
 mark :2
 author John Doe <john.doe@example.com> 1283943965 -0400
 committer John Doe <john.doe@example.com> 1283943965 -0400
@@ -39,7 +43,7 @@ data 2
 B
 from :1
 
-commit refs/namespaces/gitgo/heads/1d46e67766042c5944705377eaf0db511e7b2caf
+commit refs/heads/gitgo-import
 mark :3
 author John Doe <john.doe@example.com> 1283943965 -0400
 committer John Doe <john.doe@example.com> 1283943965 -0400
@@ -48,4 +52,65 @@ C
 from :2
 
 " -
+}
+
+#
+# marks
+#
+
+test_export_writes_export_marks_to_gitgo_dir () {
+  use 'abc'
+  gitgo-export > /dev/null
+  sort "$gitgo_dir/marks" | assert_output "\
+:1 1d46e67766042c5944705377eaf0db511e7b2caf
+:2 5edd08962760cdf479144c6b6aad6cda92433094
+:3 59f87692ec9481980675496dd88ef70babece5d5
+" -
+}
+
+test_export_uses_existing_export_marks () {
+  use 'abc'
+  mkdir -p "$gitgo_dir"
+  cat > "$gitgo_dir/marks" <<DOC
+:1 1d46e67766042c5944705377eaf0db511e7b2caf
+:2 5edd08962760cdf479144c6b6aad6cda92433094
+DOC
+
+  gitgo-export | assert_output "\
+commit refs/heads/gitgo-import
+mark :3
+author John Doe <john.doe@example.com> 1283943965 -0400
+committer John Doe <john.doe@example.com> 1283943965 -0400
+data 2
+C
+from :2
+
+" -
+}
+
+#
+# -p option
+#
+
+test_export_uses_but_does_not_update_marks_file_with_p_option () {
+  use 'abc'
+  mkdir -p "$gitgo_dir"
+  cat > "$gitgo_dir/marks" <<DOC
+:1 1d46e67766042c5944705377eaf0db511e7b2caf
+:2 59f87692ec9481980675496dd88ef70babece5d5
+DOC
+
+  assert_output "1" < <(gitgo-export -p | count "^commit ")
+  assert_output "1" < <(gitgo-export    | count "^commit ")
+}
+
+#
+# -f option
+#
+
+test_export_ignores_existing_export_marks_with_f () {
+  use 'abc'
+  gitgo-export    | count "^commit " | assert_output "3" - || exit $?
+  gitgo-export    | count "^commit " | assert_output "0" - || exit $?
+  gitgo-export -f | count "^commit " | assert_output "3" - || exit $?
 }
